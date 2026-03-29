@@ -15,7 +15,7 @@ import {
   ArrowLeft,
   Zap,
 } from "lucide-react";
-import "./landing.css";
+import "../flutter/landing.css";
 
 const DEMO_ANCL_CODE = `#n:InstaLite,d
  
