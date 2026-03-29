@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local files
+daytona_integration_guide.md
+deep-research-report*.md
+image.png
+nul
+plans/
+reference.jpeg
+refernce-2.jpeg
+workspace_verify*.png
