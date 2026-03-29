@@ -6,19 +6,34 @@ const COOKIE_PROVIDER = "user-api-provider";
 
 /** Check if a global API key is configured in the environment */
 function hasGlobalKey(): boolean {
-  return !!(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY);
+  return !!(
+    process.env.OPENAI_API_KEY ||
+    process.env.ANTHROPIC_API_KEY ||
+    process.env.GROQ_API_KEY ||
+    process.env.NVIDIA_API_KEY
+  );
+}
+
+function getGlobalKeyProvider(): "openai" | "anthropic" | "groq" | "nvidia" {
+  if (process.env.NVIDIA_API_KEY) return "nvidia";
+  if (process.env.GROQ_API_KEY) return "groq";
+  if (process.env.ANTHROPIC_API_KEY) return "anthropic";
+  if (process.env.OPENAI_API_KEY) return "openai";
+  return "openai";
 }
 
 /** GET – returns whether the user needs to provide a key */
 export async function GET() {
   const jar = await cookies();
   const userKey = jar.get(COOKIE_NAME)?.value;
-  const userProvider = jar.get(COOKIE_PROVIDER)?.value ?? "openai";
+  const userProvider = jar.get(COOKIE_PROVIDER)?.value;
+
+  const provider = userProvider ?? (hasGlobalKey() ? getGlobalKeyProvider() : "openai");
 
   return NextResponse.json({
     hasGlobalKey: hasGlobalKey(),
     hasUserKey: !!userKey,
-    provider: userProvider,
+    provider,
   });
 }
 
@@ -26,7 +41,7 @@ export async function GET() {
 export async function POST(req: Request) {
   const body = (await req.json()) as {
     apiKey?: string;
-    provider?: "openai" | "anthropic";
+    provider?: "openai" | "anthropic" | "groq" | "nvidia";
     action?: "save" | "delete";
   };
 
@@ -49,6 +64,20 @@ export async function POST(req: Request) {
   if (provider === "openai" && !apiKey.startsWith("sk-")) {
     return NextResponse.json(
       { error: "OpenAI keys start with sk-" },
+      { status: 400 },
+    );
+  }
+
+  if (provider === "groq" && !apiKey.startsWith("gsk_")) {
+    return NextResponse.json(
+      { error: "Groq keys start with gsk_" },
+      { status: 400 },
+    );
+  }
+
+  if (provider === "nvidia" && !apiKey.startsWith("nvapi-")) {
+    return NextResponse.json(
+      { error: "NVIDIA keys start with nvapi-" },
       { status: 400 },
     );
   }

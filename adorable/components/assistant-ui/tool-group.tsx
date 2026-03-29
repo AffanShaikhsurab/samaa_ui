@@ -105,13 +105,16 @@ const summarize = (tools: ToolInfo[]): string => {
   for (const t of tools) {
     const file = typeof t.args.file === "string" ? t.args.file : undefined;
     switch (t.toolName) {
+      case "readFile":
       case "readFileTool":
         reads++;
         break;
+      case "writeFile":
       case "writeFileTool":
         writes++;
         singleFile ??= file;
         break;
+      case "replaceInFile":
       case "replaceInFileTool":
       case "appendToFileTool":
         edits++;
@@ -120,10 +123,19 @@ const summarize = (tools: ToolInfo[]): string => {
       case "searchFilesTool":
         searches++;
         break;
+      case "listFiles":
       case "listFilesTool":
         reads++;
         break;
+      case "bash":
       case "bashTool":
+        cmds++;
+        break;
+      case "flutterCreate":
+      case "flutterPubGet":
+      case "flutterBuildWeb":
+      case "flutterServeWeb":
+      case "flutterDoctor":
         cmds++;
         break;
       default:
@@ -193,28 +205,28 @@ export const ToolCallGroup: FC<
   const showSpinner = anyToolRunning || (isTrailing && messageIsRunning);
 
   return (
-    <div className="my-0.5">
+    <div className="my-1">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex max-w-full items-center gap-1.5 rounded px-2 py-1 text-left text-sm text-muted-foreground transition-colors hover:bg-muted/60"
+        className="inline-flex max-w-full items-center gap-2 rounded-lg bg-black/[0.03] border border-black/5 px-3 py-1.5 text-left text-[13px] font-medium text-slate-500 transition-all hover:bg-black/[0.05] hover:text-slate-900"
       >
         {showSpinner ? (
-          <CircleDashedIcon className="size-3.5 shrink-0 animate-spin" />
+          <CircleDashedIcon className="size-3.5 shrink-0 animate-spin text-sky-500" />
         ) : (
-          <CheckIcon className="size-3.5 shrink-0" />
+          <CheckIcon className="size-3.5 shrink-0 text-emerald-500" />
         )}
         <span className="truncate">{summary}</span>
         <ChevronRightIcon
           className={cn(
-            "ml-auto size-3 shrink-0 transition-transform",
+            "ml-auto size-3 shrink-0 transition-transform opacity-40",
             open && "rotate-90",
           )}
         />
       </button>
 
       {open && (
-        <div className="ml-2 border-l border-border pl-2">{children}</div>
+        <div className="ml-4 mt-2 border-l-2 border-black/5 pl-4 flex flex-col gap-2">{children}</div>
       )}
     </div>
   );

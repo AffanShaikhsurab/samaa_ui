@@ -1,6 +1,30 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* 
+   --------------------------------------------------
+   ZENG PHILOSOPHY DESIGN TOKENS
+   --------------------------------------------------
+*/
+:root {
+  --accent-deep: #000000;
+  --accent-soft: #333333;
+  --sky-blue: #8CBCE4;
+  --warm-cloud: #FAD9A1;
+  --soft-shadow: #B2A4D4;
+  
+  --border-dim: rgba(0, 0, 0, 0.06); 
+  --border-glass: rgba(0, 0, 0, 0.05);
+  --bg-glass: rgba(255, 255, 255, 0.1); 
+  
+  --shadow-premium: 0 40px 80px -20px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.141 0.005 285.823);
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -50,6 +74,12 @@
     to {
       background-position: -100% 0;
     }
+  }
+
+  --shadow-premium: var(--shadow-premium);
+  @keyframes unblur-reveal {
+    from { filter: blur(16px); opacity: 0; transform: translateY(20px); }
+    to { filter: blur(0px); opacity: 1; transform: translateY(0); }
   }
 }
 
@@ -136,6 +166,138 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+  }
+
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-[60px] border border-white/10 shadow-premium rounded-2xl;
+  }
+
+  .unblur-reveal {
+    animation: unblur-reveal 1.2s var(--ease-out-expo) forwards;
+  }
+
+  .grain-layer {
+    @apply fixed inset-0 z-10 pointer-events-none opacity-[0.02];
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  .full-blur-overlay {
+    @apply fixed inset-0 z-0 backdrop-blur-[12px] bg-white/30 pointer-events-none;
+  }
+
+  .page-grid-dashed {
+    @apply fixed inset-0 max-w-[1240px] mx-auto border-x border-dashed border-black/5 pointer-events-none z-10;
   }
 }
+
+/* 
+   --------------------------------------------------
+   CUSTOM SAMAA UI CLASSES
+   --------------------------------------------------
+*/
+.top-banner {
+  width: 100%;
+  padding: 12px 0;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  letter-spacing: -0.2px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: -1px;
+}
+
+.vessel-group {
+  width: 100%;
+  position: relative;
+}
+
+.input-vessel {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(60px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
+}
+.page-grid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  border-left: 1px dashed rgba(0, 0, 0, 0.05);
+  border-right: 1px dashed rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  pointer-events: none;
+}
+.page-grid > * {
+  pointer-events: auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32px 48px;
+}
+@media (max-width: 1024px) {
+  .page-grid { border: none; padding: 0 20px; }
+  header { padding: 32px 0; }
+}
+
+.glass-shimmer {
+  position: absolute;
+  top: 0; left: -150%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.prompt-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 19px;
+  padding: 12px 12px 40px 12px;
+  resize: none;
+  min-height: 110px;
+  font-weight: 400;
+}
+
+.tag-pill {
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  padding: 10px 24px;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 500;
+  backdrop-filter: blur(20px);
+  transition: all 0.3s;
+}
+
+.tag-pill:hover {
+  background: var(--accent-deep);
+  color: #fff;
+}
+/* Overrides removed to support unified glassmorphic theme in workspace */
+

@@ -97,7 +97,7 @@ function ReasoningFade({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="reasoning-fade"
       className={cn(
         "aui-reasoning-fade pointer-events-none absolute inset-x-0 bottom-0 z-10 h-8",
-        "bg-[linear-gradient(to_top,var(--color-background),transparent)]",
+        "bg-[linear-gradient(to_top,white,transparent)]",
         "fade-in-0 animate-in",
         "group-data-[state=open]/collapsible-content:animate-out",
         "group-data-[state=open]/collapsible-content:fade-out-0",
@@ -114,52 +114,26 @@ function ReasoningFade({ className, ...props }: React.ComponentProps<"div">) {
 
 function ReasoningTrigger({
   active,
-  duration,
   className,
   ...props
-}: React.ComponentProps<typeof CollapsibleTrigger> & {
-  active?: boolean;
-  duration?: number;
-}) {
-  const durationText = duration ? ` (${duration}s)` : "";
-
+}: React.ComponentProps<typeof CollapsibleTrigger> & { active?: boolean }) {
   return (
     <CollapsibleTrigger
       data-slot="reasoning-trigger"
       className={cn(
-        "aui-reasoning-trigger group/trigger flex max-w-[75%] items-center gap-2 py-1 text-muted-foreground text-sm transition-colors hover:text-foreground",
+        "aui-reasoning-trigger flex items-center gap-2 text-slate-400 hover:text-slate-900 transition-colors",
         className,
       )}
       {...props}
     >
-      <BrainIcon
-        data-slot="reasoning-trigger-icon"
-        className="aui-reasoning-trigger-icon size-4 shrink-0"
-      />
-      <span
-        data-slot="reasoning-trigger-label"
-        className="aui-reasoning-trigger-label-wrapper relative inline-block leading-none"
-      >
-        <span>Reasoning{durationText}</span>
-        {active ? (
-          <span
-            aria-hidden
-            data-slot="reasoning-trigger-shimmer"
-            className="aui-reasoning-trigger-shimmer shimmer pointer-events-none absolute inset-0 motion-reduce:animate-none"
-          >
-            Reasoning{durationText}
-          </span>
-        ) : null}
-      </span>
-      <ChevronDownIcon
-        data-slot="reasoning-trigger-chevron"
-        className={cn(
-          "aui-reasoning-trigger-chevron mt-0.5 size-4 shrink-0",
-          "transition-transform duration-(--animation-duration) ease-out",
-          "group-data-[state=closed]/trigger:-rotate-90",
-          "group-data-[state=open]/trigger:rotate-0",
+      <div className="relative">
+        <BrainIcon className="size-3.5" />
+        {active && (
+          <span className="absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-sky-500 animate-pulse" />
         )}
-      />
+      </div>
+      <span className="text-[12px] font-bold uppercase tracking-widest">Thought Process</span>
+      <ChevronDownIcon className="size-3.5 transition-transform duration-(--animation-duration) [[data-slot=reasoning-root][data-state=open]_&]:rotate-180" />
     </CollapsibleTrigger>
   );
 }
@@ -173,20 +147,14 @@ function ReasoningContent({
     <CollapsibleContent
       data-slot="reasoning-content"
       className={cn(
-        "aui-reasoning-content relative overflow-hidden text-muted-foreground text-sm outline-none",
-        "group/collapsible-content ease-out",
-        "data-[state=closed]:animate-collapsible-up",
-        "data-[state=open]:animate-collapsible-down",
-        "data-[state=closed]:fill-mode-forwards",
-        "data-[state=closed]:pointer-events-none",
-        "data-[state=open]:duration-(--animation-duration)",
-        "data-[state=closed]:duration-(--animation-duration)",
+        "aui-reasoning-content overflow-hidden text-sm transition-all duration-(--animation-duration) data-[state=closed]:animate-collapse-up data-[state=open]:animate-collapse-down",
         className,
       )}
       {...props}
     >
-      {children}
-      <ReasoningFade />
+      <div className="aui-reasoning-content-inner relative mt-3 rounded-xl border border-black/5 bg-black/[0.02] px-4 py-3 text-slate-600">
+        {children}
+      </div>
     </CollapsibleContent>
   );
 }

@@ -22,7 +22,7 @@ import {
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-type Provider = "openai" | "anthropic";
+type Provider = "openai" | "anthropic" | "groq" | "nvidia";
 
 type ApiKeyStatus = {
   hasGlobalKey: boolean;
@@ -136,14 +136,14 @@ function ApiKeySetupScreen({ onSaved }: { onSaved: () => void }) {
             <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
               Provider
             </label>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               <button
                 type="button"
                 onClick={() => {
                   setProvider("openai");
                   setError(null);
                 }}
-                className={`flex-1 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
+                className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
                   provider === "openai"
                     ? "border-foreground/20 bg-foreground/5 text-foreground"
                     : "border-border text-muted-foreground hover:border-foreground/20 hover:text-foreground"
@@ -157,13 +157,41 @@ function ApiKeySetupScreen({ onSaved }: { onSaved: () => void }) {
                   setProvider("anthropic");
                   setError(null);
                 }}
-                className={`flex-1 rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
+                className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
                   provider === "anthropic"
                     ? "border-foreground/20 bg-foreground/5 text-foreground"
                     : "border-border text-muted-foreground hover:border-foreground/20 hover:text-foreground"
                 }`}
               >
                 Anthropic
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setProvider("groq");
+                  setError(null);
+                }}
+                className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
+                  provider === "groq"
+                    ? "border-foreground/20 bg-foreground/5 text-foreground"
+                    : "border-border text-muted-foreground hover:border-foreground/20 hover:text-foreground"
+                }`}
+              >
+                Groq
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setProvider("nvidia");
+                  setError(null);
+                }}
+                className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors ${
+                  provider === "nvidia"
+                    ? "border-foreground/20 bg-foreground/5 text-foreground"
+                    : "border-border text-muted-foreground hover:border-foreground/20 hover:text-foreground"
+                }`}
+              >
+                NVIDIA
               </button>
             </div>
           </div>
@@ -180,7 +208,15 @@ function ApiKeySetupScreen({ onSaved }: { onSaved: () => void }) {
                 setApiKey(e.target.value);
                 setError(null);
               }}
-              placeholder={provider === "openai" ? "sk-..." : "sk-ant-..."}
+              placeholder={
+                provider === "openai"
+                  ? "sk-..."
+                  : provider === "anthropic"
+                    ? "sk-ant-..."
+                    : provider === "groq"
+                      ? "gsk_..."
+                      : "nvapi-..."
+              }
               onKeyDown={(e) => {
                 if (e.key === "Enter") void handleSave();
               }}
@@ -205,7 +241,7 @@ function ApiKeySetupScreen({ onSaved }: { onSaved: () => void }) {
           </Button>
 
           {/* Get key links */}
-          <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
             <a
               href="https://platform.openai.com/api-keys"
               target="_blank"
@@ -223,6 +259,26 @@ function ApiKeySetupScreen({ onSaved }: { onSaved: () => void }) {
               className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
             >
               Get Anthropic key
+              <ExternalLinkIcon className="size-3" />
+            </a>
+            <span className="text-muted-foreground/30">·</span>
+            <a
+              href="https://console.groq.com/keys"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
+            >
+              Get Groq key
+              <ExternalLinkIcon className="size-3" />
+            </a>
+            <span className="text-muted-foreground/30">·</span>
+            <a
+              href="https://ngc.nvidia.com/setup/api-key"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 transition-colors hover:text-foreground"
+            >
+              Get NVIDIA key
               <ExternalLinkIcon className="size-3" />
             </a>
           </div>
@@ -360,6 +416,34 @@ export function ApiKeySettingsDialog() {
               >
                 Anthropic
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setProvider("groq");
+                  setError(null);
+                }}
+                className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                  provider === "groq"
+                    ? "border-foreground/20 bg-foreground/5 text-foreground"
+                    : "border-border text-muted-foreground hover:border-foreground/20 hover:text-foreground"
+                }`}
+              >
+                Groq
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setProvider("nvidia");
+                  setError(null);
+                }}
+                className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                  provider === "nvidia"
+                    ? "border-foreground/20 bg-foreground/5 text-foreground"
+                    : "border-border text-muted-foreground hover:border-foreground/20 hover:text-foreground"
+                }`}
+              >
+                NVIDIA
+              </button>
             </div>
           </div>
 
@@ -380,7 +464,11 @@ export function ApiKeySettingsDialog() {
                   ? "Enter new key to replace…"
                   : provider === "openai"
                     ? "sk-..."
-                    : "sk-ant-..."
+                    : provider === "anthropic"
+                      ? "sk-ant-..."
+                      : provider === "groq"
+                        ? "gsk_..."
+                        : "nvapi-..."
               }
               onKeyDown={(e) => {
                 if (e.key === "Enter") void handleSave();

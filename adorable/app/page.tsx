@@ -1,6 +1,6 @@
-import { Assistant } from "./assistant";
-import { HomeWelcome } from "@/components/assistant-ui/home-welcome";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return <Assistant welcome={<HomeWelcome />} />;
+  // Default to Flutter builder - redirect to /flutter
+  redirect("/flutter");
 }

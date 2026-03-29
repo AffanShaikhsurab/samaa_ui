@@ -12,6 +12,11 @@ import {
   CommitToolCard,
   DevServerLogsToolCard,
   DeletePathToolCard,
+  FlutterBuildWebToolCard,
+  FlutterCreateToolCard,
+  FlutterDoctorToolCard,
+  FlutterPubGetToolCard,
+  FlutterServeWebToolCard,
   ListFilesToolCard,
   MakeDirectoryToolCard,
   MovePathToolCard,
@@ -56,12 +61,9 @@ import type { FC, ReactNode } from "react";
 export const Thread: FC<{ welcome?: ReactNode }> = ({ welcome }) => {
   return (
     <ThreadPrimitive.Root
-      className="aui-root aui-thread-root @container flex h-full flex-col bg-background"
-      style={{
-        ["--thread-max-width" as string]: "44rem",
-      }}
+      className="aui-root aui-thread-root workspace-thread-root @container flex h-full flex-col bg-transparent"
     >
-      <ThreadPrimitive.Viewport className="aui-thread-viewport relative flex flex-1 flex-col overflow-x-hidden overflow-y-scroll px-4 pt-4">
+      <ThreadPrimitive.Viewport className="aui-thread-viewport aui-no-scrollbar relative flex flex-1 flex-col overflow-x-hidden overflow-y-auto px-6 py-8 scroll-smooth">
         {welcome && (
           <AssistantIf condition={({ thread }) => thread.isEmpty}>
             {welcome}
@@ -76,7 +78,7 @@ export const Thread: FC<{ welcome?: ReactNode }> = ({ welcome }) => {
           }}
         />
 
-        <ThreadPrimitive.ViewportFooter className="aui-thread-viewport-footer sticky bottom-0 mx-auto mt-auto flex w-full max-w-(--thread-max-width) flex-col gap-4 overflow-visible rounded-t-3xl bg-background pb-4 md:pb-6">
+        <ThreadPrimitive.ViewportFooter className="aui-thread-viewport-footer sticky bottom-0 mx-auto mt-auto flex w-full flex-col gap-4 overflow-visible bg-transparent pb-4">
           <ThreadScrollToBottom />
           <Composer />
         </ThreadPrimitive.ViewportFooter>
@@ -100,63 +102,52 @@ const ThreadScrollToBottom: FC = () => {
 };
 const Composer: FC = () => {
   return (
-    <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col">
-      <ComposerPrimitive.AttachmentDropzone className="aui-composer-attachment-dropzone flex w-full flex-col rounded-2xl border border-input bg-background px-1 pt-2 transition-shadow outline-none has-[textarea:focus-visible]:border-ring has-[textarea:focus-visible]:ring-2 has-[textarea:focus-visible]:ring-ring/20 data-[dragging=true]:border-dashed data-[dragging=true]:border-ring data-[dragging=true]:bg-accent/50">
-        <ComposerAttachments />
-        <ComposerPrimitive.Input
-          placeholder="Send a message..."
-          className="aui-composer-input mb-1 max-h-32 min-h-14 w-full resize-none bg-transparent px-4 pt-2 pb-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-0"
-          rows={1}
-          aria-label="Message input"
-        />
-        <ComposerAction />
-      </ComposerPrimitive.AttachmentDropzone>
-    </ComposerPrimitive.Root>
+    <div className="w-full px-4 py-4">
+      <ComposerPrimitive.Root className="relative flex w-full flex-col">
+        <ComposerPrimitive.AttachmentDropzone className="flex items-center gap-2 bg-white/80 backdrop-blur-xl border border-black/5 rounded-2xl px-4 py-2.5 shadow-sm focus-within:border-sky-500/30 transition-all">
+          <ComposerAttachments />
+          <ComposerPrimitive.Input
+            data-composer-textarea="true"
+            placeholder="Add custom logic..."
+            className="flex-1 bg-transparent border-none outline-none text-slate-900 text-[14px] py-1.5 placeholder:text-slate-400"
+            rows={1}
+            aria-label="Message input"
+          />
+          <div className="z-10 shrink-0">
+            <ComposerAction />
+          </div>
+        </ComposerPrimitive.AttachmentDropzone>
+      </ComposerPrimitive.Root>
+    </div>
   );
 };
 
 const ComposerAction: FC = () => {
   return (
-    <div className="aui-composer-action-wrapper relative mx-2 mb-2 flex items-center justify-between">
-      <ComposerAddAttachment />
-
+    <>
       <AssistantIf condition={({ thread }) => !thread.isRunning}>
         <ComposerPrimitive.Send asChild>
-          <TooltipIconButton
-            tooltip="Send message"
-            side="bottom"
-            type="submit"
-            variant="default"
-            size="icon"
-            className="aui-composer-send size-8 rounded-full"
-            aria-label="Send message"
-          >
-            <ArrowUpIcon className="aui-composer-send-icon size-4" />
-          </TooltipIconButton>
+          <button type="submit" className="flex size-8 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm hover:bg-slate-800 transition-all active:scale-95">
+             <ArrowUpIcon className="size-4" />
+          </button>
         </ComposerPrimitive.Send>
       </AssistantIf>
 
       <AssistantIf condition={({ thread }) => thread.isRunning}>
         <ComposerPrimitive.Cancel asChild>
-          <Button
-            type="button"
-            variant="default"
-            size="icon"
-            className="aui-composer-cancel size-8 rounded-full"
-            aria-label="Stop generating"
-          >
-            <SquareIcon className="aui-composer-cancel-icon size-3 fill-current" />
-          </Button>
+          <button type="button" className="flex size-8 items-center justify-center rounded-xl bg-slate-100 text-slate-900 hover:bg-slate-200 transition-all">
+            <SquareIcon className="size-3 fill-current" />
+          </button>
         </ComposerPrimitive.Cancel>
       </AssistantIf>
-    </div>
+    </>
   );
 };
 
 const MessageError: FC = () => {
   return (
     <MessagePrimitive.Error>
-      <ErrorPrimitive.Root className="aui-message-error-root mt-2 rounded-md border border-destructive bg-destructive/10 p-3 text-sm text-destructive dark:bg-destructive/5 dark:text-red-200">
+      <ErrorPrimitive.Root className="aui-message-error-root">
         <ErrorPrimitive.Message className="aui-message-error-message line-clamp-2" />
       </ErrorPrimitive.Root>
     </MessagePrimitive.Error>
@@ -166,10 +157,10 @@ const MessageError: FC = () => {
 const AssistantMessage: FC = () => {
   return (
     <MessagePrimitive.Root
-      className="aui-assistant-message-root relative mx-auto w-full max-w-(--thread-max-width) animate-in py-3 duration-150 fade-in slide-in-from-bottom-1"
+      className="relative mx-auto w-full animate-in py-4 duration-150 fade-in slide-in-from-bottom-1"
       data-role="assistant"
     >
-      <div className="aui-assistant-message-content px-2 leading-relaxed wrap-break-word text-foreground">
+      <div className="prose prose-slate prose-sm max-w-none">
         <MessagePrimitive.Unstable_PartsGrouped
           groupingFunction={groupConsecutiveToolCalls}
           components={{
@@ -178,6 +169,17 @@ const AssistantMessage: FC = () => {
             Group: ToolCallGroup,
             tools: {
               by_name: {
+                bash: BashToolCard,
+                readFile: ReadFileToolCard,
+                writeFile: WriteFileToolCard,
+                listFiles: ListFilesToolCard,
+                replaceInFile: ReplaceInFileToolCard,
+                flutterDoctor: FlutterDoctorToolCard,
+                flutterCreate: FlutterCreateToolCard,
+                flutterPubGet: FlutterPubGetToolCard,
+                flutterBuildWeb: FlutterBuildWebToolCard,
+                flutterServeWeb: FlutterServeWebToolCard,
+                // Legacy names (kept for backwards compat)
                 bashTool: BashToolCard,
                 readFileTool: ReadFileToolCard,
                 writeFileTool: WriteFileToolCard,
@@ -199,7 +201,7 @@ const AssistantMessage: FC = () => {
         <MessageError />
       </div>
 
-      <div className="aui-assistant-message-footer mt-1 ml-2 flex">
+      <div className="mt-2 flex items-center gap-2">
         <BranchPicker />
         <AssistantActionBar />
       </div>
@@ -259,21 +261,18 @@ const AssistantActionBar: FC = () => {
 const UserMessage: FC = () => {
   return (
     <MessagePrimitive.Root
-      className="aui-user-message-root mx-auto grid w-full max-w-(--thread-max-width) animate-in auto-rows-auto grid-cols-[minmax(72px,1fr)_auto] content-start gap-y-2 px-2 py-3 duration-150 fade-in slide-in-from-bottom-1 [&:where(>*)]:col-start-2"
+      className="relative mx-auto grid w-full animate-in auto-rows-auto grid-cols-[minmax(72px,1fr)_auto] content-start gap-y-2 py-4 duration-150 fade-in slide-in-from-bottom-1 [&:where(>*)]:col-start-2"
       data-role="user"
     >
       <UserMessageAttachments />
 
-      <div className="aui-user-message-content-wrapper relative col-start-2 min-w-0">
-        <div className="aui-user-message-content rounded-2xl bg-muted px-4 py-2.5 wrap-break-word text-foreground">
+      <div className="relative col-start-2 min-w-0 max-w-[85%] bg-sky-500 text-white rounded-2xl px-4 py-2.5 shadow-sm">
+        <div className="text-[14px] leading-relaxed font-medium">
           <MessagePrimitive.Parts />
-        </div>
-        <div className="aui-user-action-bar-wrapper absolute top-1/2 left-0 -translate-x-full -translate-y-1/2 pr-2">
-          <UserActionBar />
         </div>
       </div>
 
-      <BranchPicker className="aui-user-branch-picker col-span-full col-start-1 row-start-3 -mr-1 justify-end" />
+      <BranchPicker className="col-span-full col-start-1 row-start-3 -mr-1 justify-end" />
     </MessagePrimitive.Root>
   );
 };

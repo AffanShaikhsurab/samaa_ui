@@ -64,11 +64,11 @@ const StatusIcon = ({
     status?.type === "incomplete" && status.reason === "cancelled";
   if (running)
     return (
-      <CircleDashedIcon className="size-3.5 shrink-0 animate-spin text-muted-foreground" />
+      <CircleDashedIcon className="size-3.5 shrink-0 animate-spin text-sky-500" />
     );
   if (failed || cancelled)
     return <XIcon className="size-3.5 shrink-0 text-red-500" />;
-  return <CheckIcon className="size-3.5 shrink-0 text-muted-foreground" />;
+  return <CheckIcon className="size-3.5 shrink-0 text-emerald-500" />;
 };
 
 const ToolLine = ({
@@ -85,31 +85,30 @@ const ToolLine = ({
   const isFailed = failed || cancelled;
 
   return (
-    <div className="my-0.5 block w-full">
+    <div className="my-1 block w-full">
       <button
         type="button"
         onClick={() => expandContent && setOpen((v) => !v)}
         className={cn(
-          "group flex w-full max-w-full items-center gap-2 rounded-md px-2 py-1 text-left text-sm transition-colors hover:bg-muted/60",
-          isFailed && "text-red-500",
+          "group flex w-full max-w-full items-center gap-2.5 rounded-lg bg-black/[0.02] border border-black/5 px-3 py-2 text-left text-[13px] font-medium transition-all hover:bg-black/[0.04]",
+          isFailed ? "text-red-600 border-red-100 bg-red-50/50" : "text-slate-600 hover:text-slate-900",
         )}
       >
-        <span className="flex w-4 shrink-0 items-center justify-center">
+        <span className="flex size-4 shrink-0 items-center justify-center">
           {icon ?? <StatusIcon status={status} failed={failed} />}
         </span>
-
-        <span className="shrink-0 font-medium">{label}</span>
-
+        <span className="flex-1 truncate font-semibold uppercase tracking-wider text-[11px] opacity-80">
+          {label}
+        </span>
         {detail && (
-          <span className="min-w-0 truncate text-muted-foreground">
+          <span className="truncate text-slate-400 font-normal ml-auto text-xs italic">
             {detail}
           </span>
         )}
-
         {expandContent && (
           <ChevronRightIcon
             className={cn(
-              "size-3 shrink-0 text-muted-foreground opacity-0 transition-all group-hover:opacity-100",
+              "size-3 shrink-0 transition-transform opacity-40",
               open && "rotate-90",
             )}
           />
@@ -117,8 +116,10 @@ const ToolLine = ({
       </button>
 
       {open && expandContent && (
-        <div className="mt-1 mb-1 ml-7 max-h-64 overflow-auto rounded border bg-muted/30 px-3 py-2">
-          {expandContent}
+        <div className="ml-4 mt-2 border-l-2 border-black/5 pl-4 overflow-hidden">
+          <pre className="text-[12px] leading-relaxed text-slate-500 font-mono bg-black/[0.02] p-3 rounded-lg overflow-x-auto">
+            {expandContent}
+          </pre>
         </div>
       )}
     </div>
@@ -491,5 +492,172 @@ export const DeploymentStatusToolCard: ToolCallMessagePartComponent = ({
         </span>
       )}
     </div>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/*  Flutter-specific tool cards                                        */
+/* ------------------------------------------------------------------ */
+
+export const FlutterDoctorToolCard: ToolCallMessagePartComponent = ({
+  result,
+  status,
+}) => {
+  const r = obj(result);
+  const running = status?.type === "running";
+
+  return (
+    <ToolLine
+      icon={
+        running ? (
+          <CircleDashedIcon className="size-3.5 shrink-0 animate-spin text-muted-foreground" />
+        ) : (
+          <CheckIcon className="size-3.5 shrink-0 text-muted-foreground" />
+        )
+      }
+      label={running ? "Checking Flutter…" : "Flutter doctor"}
+      status={status}
+      expandContent={
+        r.stdout ? <DetailBlock data={r.stdout} /> : undefined
+      }
+    />
+  );
+};
+
+export const FlutterCreateToolCard: ToolCallMessagePartComponent = ({
+  argsText,
+  result,
+  status,
+}) => {
+  const a = parse(argsText);
+  const r = obj(result);
+  const running = status?.type === "running";
+  const name = str(a.name) ?? "project";
+  const failed = !running && r.ok === false;
+
+  return (
+    <ToolLine
+      icon={
+        running ? (
+          <CircleDashedIcon className="size-3.5 shrink-0 animate-spin text-muted-foreground" />
+        ) : failed ? (
+          <XIcon className="size-3.5 shrink-0 text-red-500" />
+        ) : (
+          <CheckIcon className="size-3.5 shrink-0 text-muted-foreground" />
+        )
+      }
+      label={running ? "Creating project…" : failed ? "Create failed" : "Created project"}
+      detail={name}
+      status={status}
+      failed={failed}
+      expandContent={
+        r.stderr || r.stdout ? <DetailBlock data={r.stderr || r.stdout} /> : undefined
+      }
+    />
+  );
+};
+
+export const FlutterPubGetToolCard: ToolCallMessagePartComponent = ({
+  argsText,
+  result,
+  status,
+}) => {
+  const a = parse(argsText);
+  const r = obj(result);
+  const running = status?.type === "running";
+  const dir = str(a.projectDir) ?? "";
+  const failed = !running && r.ok === false;
+
+  return (
+    <ToolLine
+      icon={
+        running ? (
+          <CircleDashedIcon className="size-3.5 shrink-0 animate-spin text-muted-foreground" />
+        ) : failed ? (
+          <XIcon className="size-3.5 shrink-0 text-red-500" />
+        ) : (
+          <CheckIcon className="size-3.5 shrink-0 text-muted-foreground" />
+        )
+      }
+      label={running ? "Installing deps…" : failed ? "Pub get failed" : "Installed deps"}
+      detail={dir}
+      status={status}
+      failed={failed}
+      expandContent={
+        r.stderr || r.stdout ? <DetailBlock data={r.stderr || r.stdout} /> : undefined
+      }
+    />
+  );
+};
+
+export const FlutterBuildWebToolCard: ToolCallMessagePartComponent = ({
+  argsText,
+  result,
+  status,
+}) => {
+  const a = parse(argsText);
+  const r = obj(result);
+  const running = status?.type === "running";
+  const dir = str(a.projectDir) ?? "";
+  const failed = !running && r.ok === false;
+
+  return (
+    <ToolLine
+      icon={
+        running ? (
+          <CircleDashedIcon className="size-3.5 shrink-0 animate-spin text-amber-400" />
+        ) : failed ? (
+          <XIcon className="size-3.5 shrink-0 text-red-500" />
+        ) : (
+          <CheckIcon className="size-3.5 shrink-0 text-emerald-400" />
+        )
+      }
+      label={running ? "Building Flutter web…" : failed ? "Build failed" : "Built Flutter web"}
+      detail={dir}
+      status={status}
+      failed={failed}
+      expandContent={
+        r.error || r.buildLogs ? <DetailBlock data={r.error || r.buildLogs} /> : undefined
+      }
+    />
+  );
+};
+
+export const FlutterServeWebToolCard: ToolCallMessagePartComponent = ({
+  argsText,
+  result,
+  status,
+}) => {
+  const a = parse(argsText);
+  const r = obj(result);
+  const running = status?.type === "running";
+  const previewUrl = str(r.previewUrl);
+  const failed = !running && r.ok === false;
+
+  return (
+    <ToolLine
+      icon={
+        running ? (
+          <CircleDashedIcon className="size-3.5 shrink-0 animate-spin text-emerald-400" />
+        ) : failed ? (
+          <XIcon className="size-3.5 shrink-0 text-red-500" />
+        ) : (
+          <CheckIcon className="size-3.5 shrink-0 text-emerald-400" />
+        )
+      }
+      label={running ? "Starting preview…" : failed ? "Preview failed" : "Preview ready"}
+      detail={previewUrl ?? str(a.projectDir)}
+      status={status}
+      failed={failed}
+      expandContent={
+        previewUrl ? (
+          <a href={previewUrl} target="_blank" rel="noreferrer" className="text-xs text-blue-400 underline">
+            {previewUrl}
+          </a>
+        ) : r.error ? (
+          <DetailBlock data={r.error} />
+        ) : undefined
+      }
+    />
   );
 };

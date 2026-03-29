@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samaa – build any application</title>
+
+    <!-- Fonts: Inter for UI, Instrument Serif for Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- GSAP & Phosphor Icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        :root {
+            --accent-deep: #000000;
+            --accent-soft: #333333;
+            --border-dim: rgba(0, 0, 0, 0.06); 
+            --border-glass: rgba(0, 0, 0, 0.05);
+            --bg-glass: rgba(255, 255, 255, 0.1); 
+            
+            --font-ui: 'Inter', sans-serif;
+            --font-display: 'Instrument Serif', serif;
+            
+            --shadow-premium: 0 40px 80px -20px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02);
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+
+        body {
+            font-family: var(--font-ui);
+            background: #fff;
+            color: var(--accent-deep);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 
+           --------------------------------------------------
+           1. IMAGE BACKGROUND & FULL-SCREEN BLUR
+           --------------------------------------------------
+        */
+        .bg-container {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: #fff;
+        }
+
+        #bg-image {
+            width: 100%;
+            height: 100%;
+            background: url('image.png') center/cover no-repeat;
+            filter: saturate(0.5) brightness(1.1) contrast(0.95); 
+        }
+
+        .full-blur-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 5;
+            backdrop-filter: blur(48px); 
+            background: rgba(255, 255, 255, 0.02); 
+            pointer-events: none;
+        }
+
+        .grain-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 6;
+            pointer-events: none;
+            opacity: 0.02;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* 
+           --------------------------------------------------
+           2. ORCHIDS STRUCTURE
+           --------------------------------------------------
+        */
+        .page-grid {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            max-width: 1240px;
+            margin: 0 auto;
+            border-left: 1px dashed var(--border-dim);
+            border-right: 1px dashed var(--border-dim);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .page-grid > * { pointer-events: auto; }
+
+        /* 
+           --------------------------------------------------
+           3. CUSTOM CURSOR
+           --------------------------------------------------
+        */
+        .cursor-ring {
+            position: fixed;
+            width: 32px;
+            height: 32px;
+            border: 1.5px solid var(--accent-deep);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s var(--ease-out-expo), height 0.3s var(--ease-out-expo), border-color 0.3s;
+        }
+
+        .cursor-dot {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: var(--accent-deep);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10001;
+            transform: translate(-50%, -50%);
+        }
+
+        body.is-hovering .cursor-ring {
+            width: 56px;
+            height: 56px;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        /* 
+           --------------------------------------------------
+           4. NAVIGATION & BANNER
+           --------------------------------------------------
+        */
+        .top-banner {
+            width: 100%;
+            padding: 12px 0;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-deep);
+            border-bottom: 1px solid var(--border-dim);
+            letter-spacing: -0.2px;
+            background: rgba(255, 255, 255, 0.1); 
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 32px 48px;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 500;
+            color: var(--accent-deep);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -1px;
+        }
+
+        .nav-links { display: flex; gap: 32px; margin-left: 64px; }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--accent-deep);
+            opacity: 0.5;
+            font-size: 14px;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        .nav-links a:hover { opacity: 1; }
+
+        .nav-actions { display: flex; align-items: center; gap: 20px; }
+        .btn-link { 
+            text-decoration: none; color: var(--accent-deep); font-size: 14px; font-weight: 600; opacity: 0.7;
+        }
+        .btn-primary {
+            background: var(--accent-deep);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* 
+           --------------------------------------------------
+           5. HERO SECTION
+           --------------------------------------------------
+        */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 20vh;
+        }
+
+        .hero-title h1 {
+            font-family: var(--font-display);
+            font-size: 104px;
+            line-height: 0.95;
+            font-weight: 400;
+            color: var(--accent-deep);
+            letter-spacing: -4px;
+            text-align: center;
+        }
+
+        .char { display: inline-block; filter: blur(16px); opacity: 0; transform: translateY(60px); }
+
+        .hero-subtitle {
+            font-size: 19px;
+            font-weight: 500;
+            color: var(--accent-deep);
+            opacity: 0.7;
+            margin-top: 24px;
+            margin-bottom: 56px;
+            text-align: center;
+        }
+
+        /* 
+           --------------------------------------------------
+           6. PROMPT VESSEL
+           --------------------------------------------------
+        */
+        .vessel-group {
+            width: 100%;
+            max-width: 740px;
+            position: relative;
+        }
+
+        .input-vessel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(60px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-premium);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-shimmer {
+            position: absolute;
+            top: 0; left: -150%; width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: skewX(-20deg);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .prompt-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-family: var(--font-ui);
+            font-size: 19px;
+            padding: 12px 12px 40px 12px;
+            color: var(--accent-deep);
+            resize: none;
+            min-height: 110px;
+            font-weight: 400;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .tool-icons { display: flex; gap: 12px; }
+        .icon-btn {
+            background: rgba(255,255,255,0.5);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            color: var(--accent-deep);
+            width: 38px;
+            height: 38px;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-generate {
+            background: var(--accent-deep);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 100px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tags-container {
+            margin-top: 40px;
+            display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+        }
+        .tag-pill {
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            padding: 10px 24px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-deep);
+            text-decoration: none;
+            backdrop-filter: blur(20px);
+        }
+        .tag-pill:hover { background: #000; color: #fff; }
+
+        @media (max-width: 1024px) {
+            .page-grid { border: none; padding: 0 20px; }
+            header { padding: 32px 0; }
+            .nav-links { display: none; }
+            .hero-title h1 { font-size: 72px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-container">
+        <div id="bg-image"></div>
+    </div>
+    
+    <div class="full-blur-overlay"></div>
+    <div class="grain-layer"></div>
+
+    <div class="cursor-ring" id="cursorOuter"></div>
+    <div class="cursor-dot" id="cursorInner"></div>
+
+    <div class="page-grid">
+        <div class="top-banner">
+            ✦ Get early access to Samaa Horizon — Join the waitlist &rarr;
+        </div>
+
+        <header>
+            <div style="display:flex; align-items:center;">
+                <a href="#" class="logo hover-target">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C10 2 8 4 8 6C8 8 10 10 12 10C14 10 16 8 16 6C16 4 14 2 12 2Z" />
+                        <path d="M22 12C22 10 20 8 18 8C16 8 14 10 14 12C14 14 16 16 18 16C20 16 22 14 22 12Z" />
+                        <path d="M12 22C14 22 16 20 16 18C16 16 14 14 12 14C10 14 8 16 8 18C8 20 10 22 12 22Z" />
+                        <path d="M2 12C2 14 4 16 6 16C8 16 10 14 10 12C10 10 8 8 6 8C4 8 2 10 2 12Z" />
+                    </svg>
+                    samaa
+                </a>
+                <nav class="nav-links">
+                    <a href="#" class="hover-target">Pricing</a>
+                    <a href="#" class="hover-target">Enterprise</a>
+                    <a href="#" class="hover-target">Manifesto</a>
+                    <a href="#" class="hover-target">Resources <i class="ph ph-caret-down"></i></a>
+                </nav>
+            </div>
+            <div class="nav-actions">
+                <a href="#" class="btn-link hover-target">Sign in</a>
+                <a href="#" class="btn-primary hover-target">Download</a>
+            </div>
+        </header>
+
+        <main>
+            <div class="hero-title"><h1 id="heroH1">Build any application</h1></div>
+            <p class="hero-subtitle">Use your existing AI subscriptions for free &rarr;</p>
+
+            <div class="vessel-group">
+                <div class="input-vessel" id="mainVessel">
+                    <div class="glass-shimmer"></div>
+                    <textarea class="prompt-input hover-target" placeholder="Ask Samaa to build a custom dashboard" spellcheck="false"></textarea>
+                    <div class="toolbar">
+                        <div class="tool-icons">
+                            <button class="icon-btn hover-target"><i class="ph ph-layout"></i></button>
+                            <button class="icon-btn hover-target"><i class="ph ph-magic-wand"></i></button>
+                            <button class="icon-btn hover-target"><i class="ph ph-paperclip"></i></button>
+                        </div>
+                        <button class="btn-generate hover-target">Generate <i class="ph-fill ph-sparkle"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tags-container">
+                <a href="#" class="tag-pill hover-target">Web App</a>
+                <a href="#" class="tag-pill hover-target">Mobile</a>
+                <a href="#" class="tag-pill hover-target">AI Agent</a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- CUSTOM CURSOR ---
+        const outer = document.getElementById('cursorOuter');
+        const inner = document.getElementById('cursorInner');
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        let outerX = mouseX, outerY = mouseY;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX; mouseY = e.clientY;
+            inner.style.left = mouseX + 'px'; inner.style.top = mouseY + 'px';
+        });
+
+        function updateCursor() {
+            outerX += (mouseX - outerX) * 0.15; outerY += (mouseY - outerY) * 0.15;
+            outer.style.left = outerX + 'px'; outer.style.top = outerY + 'px';
+            requestAnimationFrame(updateCursor);
+        }
+        updateCursor();
+
+        document.querySelectorAll('.hover-target').forEach(t => {
+            t.addEventListener('mouseenter', () => document.body.classList.add('is-hovering'));
+            t.addEventListener('mouseleave', () => document.body.classList.remove('is-hovering'));
+        });
+
+        // --- ENTRANCE ANIMATIONS ---
+        window.addEventListener('load', () => {
+            const tl = gsap.timeline();
+            tl.from(".top-banner", { y: -50, opacity: 0, duration: 1, ease: "power4.out" })
+              .from("header", { y: -30, opacity: 0, duration: 1, ease: "power4.out" }, "-=0.6");
+
+            const heroText = document.getElementById('heroH1');
+            heroText.innerHTML = heroText.innerText.split('').map(char => `<span class="char">${char === ' ' ? '&nbsp;' : char}</span>`).join('');
+            
+            tl.to(".char", { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 1.2, stagger: 0.025, ease: "expo.out" }, "-=0.4")
+              .from(".hero-subtitle", { opacity: 0, y: 20, duration: 1 }, "-=0.8")
+              .from("#mainVessel", { y: 50, opacity: 0, duration: 1 }, "-=0.8");
+
+            gsap.to(".glass-shimmer", { left: "200%", duration: 3, repeat: -1, repeatDelay: 5 });
+            gsap.to(["main", ".hero-title"], { y: "-=8", duration: 4, repeat: -1, yoyo: true, ease: "sine.inOut" });
+        });
+    </script>
+</body>
+</html>
