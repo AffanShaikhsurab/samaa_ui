@@ -102,14 +102,14 @@ const ThreadScrollToBottom: FC = () => {
 };
 const Composer: FC = () => {
   return (
-    <div className="w-full px-4 py-4">
+    <div className="w-full px-4 py-6">
       <ComposerPrimitive.Root className="relative flex w-full flex-col">
-        <ComposerPrimitive.AttachmentDropzone className="flex items-center gap-2 bg-white/80 backdrop-blur-xl border border-black/5 rounded-2xl px-4 py-2.5 shadow-sm focus-within:border-sky-500/30 transition-all">
+        <ComposerPrimitive.AttachmentDropzone className="flex items-center gap-3 bg-white/40 backdrop-blur-3xl border border-white/40 rounded-[28px] px-6 py-3 shadow-premium transition-all duration-300 focus-within:ring-4 focus-within:ring-sky-500/10 focus-within:border-sky-500/30">
           <ComposerAttachments />
           <ComposerPrimitive.Input
             data-composer-textarea="true"
-            placeholder="Add custom logic..."
-            className="flex-1 bg-transparent border-none outline-none text-slate-900 text-[14px] py-1.5 placeholder:text-slate-400"
+            placeholder="Refine mobile interaction..."
+            className="flex-1 bg-transparent border-none outline-none text-slate-900 text-[15px] font-normal py-1.5 placeholder:text-slate-400 tracking-tight"
             rows={1}
             aria-label="Message input"
           />
@@ -157,10 +157,10 @@ const MessageError: FC = () => {
 const AssistantMessage: FC = () => {
   return (
     <MessagePrimitive.Root
-      className="relative mx-auto w-full animate-in py-4 duration-150 fade-in slide-in-from-bottom-1"
+      className="relative mx-auto w-full animate-in py-6 duration-300 fade-in slide-in-from-bottom-2"
       data-role="assistant"
     >
-      <div className="prose prose-slate prose-sm max-w-none">
+      <div className="prose prose-slate prose-sm max-w-none text-slate-800 leading-relaxed font-normal">
         <MessagePrimitive.Unstable_PartsGrouped
           groupingFunction={groupConsecutiveToolCalls}
           components={{
@@ -201,7 +201,7 @@ const AssistantMessage: FC = () => {
         <MessageError />
       </div>
 
-      <div className="mt-2 flex items-center gap-2">
+      <div className="mt-4 flex items-center gap-3">
         <BranchPicker />
         <AssistantActionBar />
       </div>
@@ -261,18 +261,18 @@ const AssistantActionBar: FC = () => {
 const UserMessage: FC = () => {
   return (
     <MessagePrimitive.Root
-      className="relative mx-auto grid w-full animate-in auto-rows-auto grid-cols-[minmax(72px,1fr)_auto] content-start gap-y-2 py-4 duration-150 fade-in slide-in-from-bottom-1 [&:where(>*)]:col-start-2"
+      className="relative mx-auto grid w-full animate-in auto-rows-auto grid-cols-[minmax(72px,1fr)_auto] content-start gap-y-2 py-6 duration-300 fade-in slide-in-from-bottom-4 [&:where(>*)]:col-start-2"
       data-role="user"
     >
       <UserMessageAttachments />
 
-      <div className="relative col-start-2 min-w-0 max-w-[85%] bg-sky-500 text-white rounded-2xl px-4 py-2.5 shadow-sm">
-        <div className="text-[14px] leading-relaxed font-medium">
+      <div className="relative col-start-2 min-w-0 max-w-[85%] bg-sky-500/10 backdrop-blur-3xl border border-sky-500/20 text-slate-900 rounded-[24px] rounded-br-[4px] px-6 py-4 shadow-sm group transition-all hover:bg-sky-500/15">
+        <div className="text-[15px] leading-relaxed font-medium tracking-tight">
           <MessagePrimitive.Parts />
         </div>
       </div>
 
-      <BranchPicker className="col-span-full col-start-1 row-start-3 -mr-1 justify-end" />
+      <BranchPicker className="col-span-full col-start-1 row-start-3 -mr-1 justify-end mt-2 opacity-0 group-hover:opacity-100 transition-opacity" />
     </MessagePrimitive.Root>
   );
 };

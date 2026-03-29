@@ -122,6 +122,23 @@ const BUILD_STEPS = [
 
 type Viewport = "desktop" | "mobile";
 
+function FlutterPreview({ viewport }: { viewport: Viewport }) {
+  const isMobile = viewport === "mobile";
+  const containerWidth = isMobile ? "w-[375px]" : "w-full max-w-[1280px]";
+  const containerHeight = isMobile ? "h-[700px]" : "h-[800px]";
+
+  return (
+    <div className={cn("bg-white rounded-[32px] overflow-hidden border border-slate-200 shadow-2xl transition-all duration-500", containerWidth, containerHeight)}>
+      <iframe
+        src="/flutter-demo/web/index.html"
+        className="w-full h-full border-0"
+        title="Flutter App Preview"
+        allow="accelerometer; camera; encrypted-media; geolocation; gyroscope; microphone; midi; clipboard-read; clipboard-write"
+      />
+    </div>
+  );
+}
+
 function InstagramPreview({ viewport }: { viewport: Viewport }) {
   const [activeTab, setActiveTab] = useState("home");
   const [stories, setStories] = useState([
@@ -454,12 +471,12 @@ export default function DemoPage() {
               exit={{ opacity: 0, y: -20 }}
               className="hero flex flex-col items-center w-full max-w-[800px] px-6 text-center"
             >
-              <div className="mb-12">
-                <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-slate-900 mb-6 leading-[1.1]">From Idea to App</h1>
-                <p className="subtitle text-lg md:text-xl text-slate-500 font-medium">Watch ANCL transform natural language into production-ready Flutter applications</p>
+              <div className="mb-12 unblur-reveal">
+                <h1 className="text-5xl md:text-8xl font-bold tracking-tight text-slate-900 mb-8 leading-[0.9] font-display">From Idea to App</h1>
+                <p className="subtitle text-xl md:text-2xl text-slate-600 font-medium max-w-2xl mx-auto">Watch ANCL transform natural language into production-ready Flutter applications</p>
               </div>
 
-              <div className="workbench w-full bg-white/65 backdrop-blur-[30px] border border-white/80 rounded-[32px] p-6 shadow-[0_8px_32px_rgba(0,0,0,0.04)] flex flex-col gap-4">
+              <div className="workbench w-full glass-card p-8 flex flex-col gap-6 unblur-reveal [animation-delay:200ms]">
                 <textarea
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
@@ -480,7 +497,7 @@ export default function DemoPage() {
                     onClick={handleStartDemo}
                     disabled={!inputValue.trim()}
                     className={cn(
-                      "btn-build bg-[#0284c7] text-white px-6 py-3 rounded-full font-bold text-sm transition-all shadow-[0_4px_12px_rgba(2,132,199,0.2)] hover:bg-[#0369a1] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none",
+                      "btn-build bg-sky-600 text-white px-10 py-4 rounded-full font-bold text-sm transition-all shadow-xl hover:bg-sky-700 hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none select-none",
                     )}
                   >
                     Generate App &rarr;
@@ -499,7 +516,7 @@ export default function DemoPage() {
             >
               <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
                 {/* Code Editor Area */}
-                <div className="lg:col-span-3 bg-white/65 backdrop-blur-[30px] border border-white/80 rounded-[32px] overflow-hidden shadow-lg flex flex-col">
+                <div className="lg:col-span-3 glass-card overflow-hidden flex flex-col unblur-reveal">
                   <div className="flex items-center justify-between px-6 py-4 border-b border-black/5 bg-white/40">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-red-400/80" />
@@ -547,8 +564,8 @@ export default function DemoPage() {
                 </div>
 
                 {/* Status Sidebar Area */}
-                <div className="lg:col-span-2 flex flex-col gap-6">
-                  <div className="bg-white/65 backdrop-blur-[30px] border border-white/80 rounded-[32px] p-8 shadow-lg">
+                <div className="lg:col-span-2 flex flex-col gap-6 unblur-reveal [animation-delay:150ms]">
+                  <div className="glass-card p-8">
                     <div className="flex items-center gap-4 mb-8">
                       <div className="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center shadow-sm">
                         <Sparkles className="w-6 h-6 text-sky-600" />
@@ -720,7 +737,7 @@ export default function DemoPage() {
 
               {/* Preview Area */}
               <div className="w-full flex justify-center py-4">
-                <InstagramPreview viewport={viewport} />
+                <FlutterPreview viewport={viewport} />
               </div>
 
               {/* Action Footer */}
