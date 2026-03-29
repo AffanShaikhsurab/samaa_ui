@@ -34,17 +34,8 @@ export default function RootLayout({
     <html lang="en" className="h-full overflow-hidden">
       <body
         suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full overflow-hidden overscroll-none antialiased cursor-none bg-white text-black`}
+        className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} min-h-screen antialiased bg-white text-black`}
       >
-        {/* ── Global background layers (always present) ───────── */}
-        <div className="fixed inset-0 z-[-1] bg-white">
-          <div
-            className="w-full h-full bg-cover bg-center no-repeat saturate-[0.5] brightness-[1.1] contrast-[0.95]"
-            style={{ backgroundImage: "url('/bg.png')" }}
-          />
-        </div>
-        <div className="full-blur-overlay" />
-        <div className="grain-layer" />
         <CustomCursor />
 
         {/* ── Page content (conditionally wrapped) ───────────── */}
