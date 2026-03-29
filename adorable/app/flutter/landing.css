@@ -1,299 +1,66 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+/* --- Sama Sky Builder Transitions --- */
 
-:root {
-    /* Airy Sky Palette - Light Theme */
-    --bg-sky-light: #f0f9ff;
-    --bg-sky-blue: #e0f2fe;
-    --sky-accent: #0284c7;
-    
-    /* Refined Material System */
-    --glass-white: rgba(255, 255, 255, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.8);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
-    
-    --text-main: #0f172a;
-    --text-muted: #64748b;
-    --text-white: #ffffff;
-    
-    --sidebar-width: 380px; /* Reduced from 440px to fix 'zoomed' feel */
-    --font-heading: 'Plus Jakarta Sans', sans-serif;
-    --font-body: 'Inter', sans-serif;
-    
-    --radius-xl: 24px;
-    --radius-2xl: 32px;
-}
-
-body {
-    font-family: var(--font-body);
-    color: var(--text-main);
-    background-color: var(--bg-sky-light);
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-}
-
-h1, h2, h3, .logo, .workspace-app-title {
-    font-family: var(--font-heading);
-    letter-spacing: -0.02em;
-    font-weight: 700;
-}
-
-/* --- Smooth Transitions --- */
-* {
-    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-/* --- Scrollbar Refinement --- */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.05);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.1);
-}
-
-.no-scrollbar {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.no-scrollbar::-webkit-scrollbar {
-    display: none;
-}
-
-/* --- Landing Page Components --- */
-
-.sama-landing-page {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-}
-
-.sama-landing-page nav {
-    width: 100%;
-    max-width: 1400px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24px 48px;
-    z-index: 50;
-}
-
-.sama-landing-page .logo {
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--text-main);
-    letter-spacing: -0.04em;
-}
-
-.sama-landing-page .nav-links a {
-    color: var(--text-muted);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: color 0.2s ease;
-}
-
-.sama-landing-page .nav-links a:hover {
-    color: var(--text-main);
-}
-
-.sama-landing-page .btn-cta {
-    background: var(--text-main);
-    color: white !important;
-    padding: 10px 20px;
-    border-radius: 100px;
-    font-weight: 600;
-}
-
-.sama-landing-page .hero {
-    margin-top: 100px;
-    text-align: center;
-    z-index: 10;
-    max-width: 800px;
-    padding: 0 24px;
-}
-
-.sama-landing-page h1 {
-    font-size: 72px;
-    line-height: 1.1;
-    color: var(--text-main);
-    margin-bottom: 24px;
-}
-
-.sama-landing-page .subtitle {
-    font-size: 20px;
-    color: var(--text-muted);
-    margin-bottom: 48px;
-}
-
-.sama-landing-page .workbench {
-    width: 100%;
-    max-width: 800px;
-    background: var(--glass-white);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius-2xl);
-    padding: 24px;
-    box-shadow: var(--glass-shadow);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.sama-landing-page .input-area {
-    width: 100%;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-size: 18px;
-    color: var(--text-main);
-    resize: none;
-    min-height: 100px;
-    font-family: inherit;
-    line-height: 1.5;
-}
-
-.sama-landing-page .input-area::placeholder {
-    color: #94a3b8;
-}
-
-.sama-landing-page .footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 16px;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.sama-landing-page .kb-hint {
-    font-size: 12px;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.sama-landing-page .kb-key {
-    background: rgba(0, 0, 0, 0.05);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: monospace;
-}
-
-.sama-landing-page .btn-build {
-    background: var(--sky-accent);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 100px;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
-}
-
-.sama-landing-page .btn-build:hover:not(:disabled) {
-    background: #0369a1;
-    transform: translateY(-1px);
-}
-
-/* --- Workspace Page Improvements --- */
-
-.workspace-root {
-    display: flex;
-    height: 100vh;
-    background: var(--bg-sky-light);
-    overflow: hidden;
-}
-
-.workspace-sidebar {
-    width: var(--sidebar-width);
-    height: 100%;
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(30px);
-    border-right: 1px solid rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-    z-index: 20;
-}
-
-.workspace-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    z-index: 10;
-}
-
-.workspace-preview-container {
-    flex: 1;
-    margin: 16px;
-    background: white;
-    border-radius: var(--radius-xl);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-    overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.workspace-app-header {
-    padding: 16px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.workspace-app-title {
-    font-size: 18px;
-    color: var(--text-main);
-}
-
-/* --- Assistant UI Overrides for Light Theme --- */
-.aui-thread-root {
-    background: transparent !important;
-}
-
-.aui-assistant-message-root {
-    background: rgba(255, 255, 255, 0.5) !important;
-    border-radius: 16px !important;
-    padding: 12px 16px !important;
-    margin: 8px 0 !important;
-    border: 1px solid rgba(0, 0, 0, 0.03) !important;
-}
-
-.aui-user-message-root {
-    background: var(--sky-accent) !important;
-    color: white !important;
-    border-radius: 16px !important;
-    padding: 12px 16px !important;
-    margin: 8px 0 !important;
-}
-
-.aui-assistant-message-content {
-    color: var(--text-main) !important;
-    font-size: 14px !important;
-    line-height: 1.6 !important;
-}
-
-/* Transition Overlays */
+/* Cloud Burst Entrance Animation */
 .cloud-burst-overlay {
     position: fixed;
     inset: 0;
     background: white;
-    z-index: 100;
+    z-index: 1000;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.5s ease;
+    transition: opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .cloud-burst-overlay.active {
     opacity: 1;
+}
+
+/* Workbench Elevation Logic */
+.workbench-uplift {
+    transform: translateY(-40px) scale(1.05);
+    opacity: 0;
+    filter: blur(20px);
+    transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Custom Prompt Input (Used in Welcome/Flutter Landing) */
+.prompt-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--slate-900);
+    resize: none;
+    min-height: 120px;
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    tracking: -0.01em;
+}
+
+.prompt-input::placeholder {
+    color: var(--slate-400);
+}
+
+/* Skeleton Animation Utilities for Blueprinting State */
+@keyframes skeleton-shiver {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.phone-frame {
+    width: 320px;
+    height: 580px;
+    background: white;
+    border-radius: 44px;
+    border: 8px solid #f1f5f9;
+    padding: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Assist-UI Overrides for White Themes */
+.aui-thread-root {
+    background: transparent !important;
 }

@@ -85,34 +85,37 @@ function BrowserBar({
   };
 
   return (
-    <div className="shrink-0 flex items-center gap-1.5 px-3 h-12 border-b border-black/5 bg-white/40 backdrop-blur-md">
-      <button
-        type="button"
-        onClick={back}
-        className="flex size-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-black/5 transition-colors"
-        title="Back"
-      >
-        <ArrowLeftIcon className="size-4" />
-      </button>
-      <button
-        type="button"
-        onClick={forward}
-        className="flex size-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-black/5 transition-colors"
-        title="Forward"
-      >
-        <ArrowRightIcon className="size-4" />
-      </button>
-      <button
-        type="button"
-        onClick={reload}
-        className="flex size-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-black/5 transition-colors"
-        title="Reload"
-      >
-        <RotateCwIcon className="size-4" />
-      </button>
+    <div className="shrink-0 flex items-center gap-2 px-4 h-14 glass-card-deep !rounded-none border-x-0 border-t-0 border-b border-black/5">
+      <div className="flex items-center gap-1.5 mr-2">
+        <button
+          type="button"
+          onClick={back}
+          className="flex size-9 items-center justify-center rounded-xl text-slate-400 hover:text-slate-900 hover:bg-black/5 transition-all active:scale-95"
+          title="Back"
+        >
+          <ArrowLeftIcon className="size-4" />
+        </button>
+        <button
+          type="button"
+          onClick={forward}
+          className="flex size-9 items-center justify-center rounded-xl text-slate-400 hover:text-slate-900 hover:bg-black/5 transition-all active:scale-95"
+          title="Forward"
+        >
+          <ArrowRightIcon className="size-4" />
+        </button>
+        <button
+          type="button"
+          onClick={reload}
+          className="flex size-9 items-center justify-center rounded-xl text-slate-400 hover:text-slate-900 hover:bg-black/5 transition-all active:scale-95"
+          title="Reload"
+        >
+          <RotateCwIcon className="size-4" />
+        </button>
+      </div>
+
       {/* Live URL pill */}
-      <div className="flex items-center gap-2 flex-1 rounded-full bg-black/5 border border-black/5 px-4 h-8">
-        <div className="size-2 rounded-full bg-emerald-500 shrink-0 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+      <div className="flex items-center gap-3 flex-1 rounded-full bg-black/5 border border-black/5 px-5 h-9 transition-all focus-within:ring-2 focus-within:ring-sky-500/20 focus-within:bg-white/50">
+        <div className="size-2 rounded-full bg-emerald-500 shrink-0 shadow-[0_0_12px_rgba(16,185,129,0.4)] animate-pulse" />
         <form
           className="flex-1"
           onSubmit={(e) => {
@@ -124,20 +127,21 @@ function BrowserBar({
             type="text"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
-            className="w-full bg-transparent text-[13px] text-slate-600 outline-none placeholder:text-slate-300 font-medium"
+            className="w-full bg-transparent text-[13px] text-slate-600 outline-none placeholder:text-slate-300 font-semibold tracking-tight"
             aria-label="Preview URL"
           />
         </form>
       </div>
+
       {/* Open in new tab */}
       <a
         href={previewUrl}
         target="_blank"
         rel="noreferrer"
-        className="flex size-8 items-center justify-center rounded-lg text-slate-400 hover:text-slate-900 hover:bg-black/5 transition-colors"
+        className="flex size-9 items-center justify-center rounded-xl text-slate-400 hover:text-slate-900 hover:bg-black/5 transition-all active:scale-95 ml-2"
         title="Open in new tab"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
           <polyline points="15 3 21 3 21 9" />
           <line x1="10" y1="14" x2="21" y2="3" />
@@ -150,27 +154,24 @@ function BrowserBar({
 // ── Blueprinting State ────────────────────────────────────────────────────
 function BlueprintingState() {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden w-full h-full">
-      {/* Assembly Particles */}
-      <div className="particle-container">
-        <div className="particle" style={{ top: "20%", left: "50%", "--x": "-400px", animationDelay: "0s" } as any}></div>
-        <div className="particle" style={{ top: "40%", left: "50%", "--x": "-350px", animationDelay: "0.5s" } as any}></div>
-        <div className="particle" style={{ top: "60%", left: "50%", "--x": "-450px", animationDelay: "1.2s" } as any}></div>
-      </div>
-
+    <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden w-full h-full bg-slate-50/50">
+      <div className="absolute inset-0 z-0 bg-white/20 backdrop-blur-[100px]" />
+      
       {/* The Skeleton Preview */}
-      <div className="phone-frame">
-        <div className="skeleton-header"></div>
-        <div className="skeleton-item"></div>
-        <div className="skeleton-item"></div>
-        <div className="skeleton-item"></div>
-        <div className="skeleton-item"></div>
-        <div className="skeleton-fab"></div>
+      <div className="phone-frame unblur-reveal relative z-10 shadow-2xl scale-110">
+        <div className="skeleton-header animate-pulse bg-slate-100 h-14 mb-4 rounded-xl mx-4 mt-4"></div>
+        <div className="skeleton-item animate-pulse bg-slate-50 h-32 mb-4 rounded-2xl mx-4"></div>
+        <div className="skeleton-item animate-pulse bg-slate-100 h-12 mb-4 rounded-xl mx-4"></div>
+        <div className="skeleton-item animate-pulse bg-slate-50 h-24 mb-4 rounded-2xl mx-4"></div>
+        <div className="skeleton-fab animate-pulse bg-sky-100 size-14 rounded-full absolute bottom-6 right-6"></div>
       </div>
 
-      <div className="status-container">
-        <h1 className="status-title">Blueprinting...</h1>
-        <p className="status-sub">{">"} Initializing Material Components</p>
+      <div className="status-container relative z-10 mt-16 text-center">
+        <h1 className="status-title text-2xl font-bold text-slate-900 tracking-tight font-display mb-2">Blueprinting...</h1>
+        <div className="flex items-center gap-2 justify-center">
+          <Loader2 className="size-3 animate-spin text-sky-500" />
+          <p className="status-sub text-xs font-bold text-sky-600/60 uppercase tracking-widest leading-none">Initializing Material Components</p>
+        </div>
       </div>
     </div>
   );
@@ -267,19 +268,7 @@ function PreviewPanel({
 function WorkspaceContent({ initialPrompt }: { initialPrompt: string }) {
   const router = useRouter();
   const isMobile = useIsMobile();
-  // Seed the initial prompt as the first user message so the AI immediately starts
-  const [seedMessages] = useState<UIMessage[]>(() => {
-    if (!initialPrompt) return EMPTY_MESSAGES;
-    return [
-      {
-        id: "seed-0",
-        role: "user",
-        content: initialPrompt,
-        parts: [{ type: "text", text: initialPrompt }],
-      } as UIMessage,
-    ];
-  });
-
+  
   const [runtimeKey] = useState(`flutter:workspace:${Date.now()}`);
   const [mobileView, setMobileView] = useState<"chat" | "preview">("chat");
 
@@ -308,19 +297,19 @@ function WorkspaceContent({ initialPrompt }: { initialPrompt: string }) {
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <div className="workspace-root">
+      <div className="workspace-root relative flex h-screen w-full overflow-hidden bg-slate-50">
         <SkyBackground variant="workspace" />
 
         {/* Sidebar / Chat Area */}
         <aside
           className={cn(
-            "workspace-sidebar h-full flex flex-col",
+            "workspace-sidebar h-full flex flex-col glass-card !rounded-none !border-y-0 !border-l-0 !shadow-none z-20 w-[400px] shrink-0",
             isMobile && mobileView === "preview" ? "hidden" : "flex"
           )}
         >
-          <header className="flex flex-col gap-4 py-6 px-6 border-b border-black/5">
+          <header className="flex flex-col gap-5 py-8 px-8 border-b border-black/5 bg-white/10 backdrop-blur-md">
             <div className="flex items-center justify-between w-full">
-              <nav className="flex items-center gap-2 text-[10px] font-bold tracking-[0.1em] text-slate-400 uppercase">
+              <nav className="flex items-center gap-2 text-[10px] font-bold tracking-[0.2em] text-slate-400 uppercase">
                 <button 
                   onClick={() => router.push("/flutter")}
                   className="hover:text-slate-900 transition-colors"
@@ -332,39 +321,39 @@ function WorkspaceContent({ initialPrompt }: { initialPrompt: string }) {
               </nav>
               
               {isBuilding ? (
-                <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-blue-50 text-[10px] font-bold text-blue-600 border border-blue-100">
-                  <div className="size-1.5 rounded-full bg-blue-500 animate-pulse" />
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-sky-50 text-[10px] font-bold text-sky-600 border border-sky-100 shadow-sm">
+                  <div className="size-1.5 rounded-full bg-sky-500 animate-pulse" />
                   BUILDING
                 </div>
               ) : (
-                <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-50 text-[10px] font-bold text-emerald-600 border border-emerald-100">
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-[10px] font-bold text-emerald-600 border border-emerald-100 shadow-sm">
                   <div className="size-1.5 rounded-full bg-emerald-500" />
                   LIVE
                 </div>
               )}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <div className="flex-1">
-                <h1 className="text-xl font-bold text-slate-900 leading-tight">
-                  {initialPrompt ? (initialPrompt.length > 30 ? initialPrompt.substring(0, 30) + "..." : initialPrompt) : "Flutter Builder"}
+                <h1 className="text-2xl font-bold text-slate-950 leading-tight tracking-tight font-display">
+                  {initialPrompt ? (initialPrompt.length > 40 ? initialPrompt.substring(0, 40) + "..." : initialPrompt) : "Flutter Builder"}
                 </h1>
-                <p className="text-[11px] text-slate-400 font-medium tracking-wide">Samaa Cloud Platform</p>
+                <p className="text-[11px] text-slate-500 font-bold tracking-widest uppercase mt-1 opacity-60">Samaa Cloud Console</p>
               </div>
               
               {isMobile && (
                 <button
                   type="button"
                   onClick={() => setMobileView("preview")}
-                  className="p-2.5 rounded-full bg-black/5 hover:bg-black/10 transition-all active:scale-95"
+                  className="p-3 rounded-2xl bg-slate-900 text-white hover:bg-black transition-all active:scale-95 shadow-lg"
                 >
-                  <Monitor className="size-4 text-slate-600" />
+                  <Monitor className="size-4" />
                 </button>
               )}
             </div>
           </header>
 
-          <div className="flex-1 min-h-0 flex flex-col">
+          <div className="flex-1 min-h-0 flex flex-col pt-4">
             <Thread />
           </div>
         </aside>
@@ -372,7 +361,7 @@ function WorkspaceContent({ initialPrompt }: { initialPrompt: string }) {
         {/* Preview Area */}
         <main
           className={cn(
-            "workspace-content h-full",
+            "workspace-content h-full flex-1 min-w-0 flex flex-col relative",
             isMobile && mobileView === "chat" ? "hidden" : "flex"
           )}
         >
@@ -381,7 +370,7 @@ function WorkspaceContent({ initialPrompt }: { initialPrompt: string }) {
                <button
                   type="button"
                   onClick={() => setMobileView("chat")}
-                  className="flex items-center gap-2 bg-white/80 backdrop-blur-xl border border-black/5 text-slate-900 px-5 py-2.5 rounded-full shadow-xl hover:bg-white active:scale-95 transition-all"
+                  className="flex items-center gap-2 bg-white/80 backdrop-blur-xl border border-black/5 text-slate-900 px-5 py-2.5 rounded-full shadow-xl hover:bg-white active:scale-95 transition-all outline-none"
                 >
                   <MessageSquare className="size-4" />
                   <span className="text-sm font-semibold">Back to Chat</span>
@@ -389,7 +378,7 @@ function WorkspaceContent({ initialPrompt }: { initialPrompt: string }) {
             </div>
           )}
           
-          <div className="workspace-preview-container">
+          <div className="workspace-preview-container flex-1 m-4 rounded-3xl overflow-hidden border border-black/5 shadow-2xl bg-white/50 backdrop-blur-sm relative z-10">
             <PreviewPanel 
               previewUrl={previewUrl} 
               isBuilding={isBuilding} 
@@ -397,8 +386,7 @@ function WorkspaceContent({ initialPrompt }: { initialPrompt: string }) {
             />
           </div>
 
-          {/* API Key settings in bottom corner if needed */}
-          <div className="absolute top-4 right-4">
+          <div className="absolute top-6 right-6 z-[20]">
             <ApiKeySettingsDialog />
           </div>
         </main>
