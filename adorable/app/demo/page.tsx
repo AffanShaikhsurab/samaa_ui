@@ -326,6 +326,7 @@ export default function InvestorDemoPage() {
   const [isResizingCode, setIsResizingCode] = useState(false);
   const [codeEditorExpanded, setCodeEditorExpanded] = useState(false);
   const [rightPanelView, setRightPanelView] = useState<"code" | "preview">("code");
+  const [mobileViewTab, setMobileViewTab] = useState<"code" | "files" | "preview">("code");
   const [mobileScale, setMobileScale] = useState(1);
   const codeEditorRef = useRef<HTMLDivElement>(null);
   const previewAreaRef = useRef<HTMLDivElement>(null);
@@ -627,8 +628,8 @@ export default function InvestorDemoPage() {
 
             {stage === "editor" && (
               <motion.div key="editor" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full flex flex-col">
-                {/* Right Panel Header - Toggle between Code Base and Preview */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5 backdrop-blur-md shrink-0">
+                {/* Desktop Header - Hidden on Mobile */}
+                <div className="hidden md:flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5 backdrop-blur-md shrink-0">
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-emerald-400 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.8)]" />
@@ -665,10 +666,9 @@ export default function InvestorDemoPage() {
                   </div>
                 </div>
                 
-                {/* Right Panel Content */}
-                <div className="flex-1 flex min-h-0">
+                {/* Desktop Content - Hidden on Mobile */}
+                <div className="hidden md:flex flex-1 min-h-0">
                   {rightPanelView === "code" ? (
-                    /* Code Base View - Same as Code Analysis */
                     <div className="flex-1 grid grid-cols-[280px_1fr] gap-4 p-4 min-h-0">
                       <aside className="glass-editorial rounded-[20px] p-5 flex flex-col text-[#374151] overflow-hidden">
                         <div className="flex justify-between items-center mb-4">
@@ -712,7 +712,6 @@ export default function InvestorDemoPage() {
                           </div>
                         </div>
                         
-                        {/* Stats Cards */}
                         <div className="grid grid-cols-2 gap-4">
                           <div className="glass-editorial rounded-[20px] p-5 text-[#374151]">
                             <span className="text-[10px] font-extrabold tracking-[1.5px] uppercase block mb-3" style={{ color: 'rgba(15, 23, 42, 0.6)' }}>Compression</span>
@@ -749,8 +748,7 @@ export default function InvestorDemoPage() {
                       </div>
                     </div>
                   ) : (
-                    /* Preview View */
-                    <div ref={previewAreaRef} className="flex-1 flex items-center justify-center p-4 md:p-6">
+                    <div ref={previewAreaRef} className="flex-1 flex items-center justify-center p-6">
                       <div 
                         className={cn(
                           "relative bg-white shadow-[0_40px_80px_-20px_rgba(0,0,0,0.25)] transition-all duration-500 overflow-hidden flex items-center justify-center",
@@ -766,7 +764,6 @@ export default function InvestorDemoPage() {
                           borderStyle: 'solid'
                         } : {}}
                       >
-                        {/* Notch for Mobile */}
                         {isMobile && (
                           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[140px] h-[32px] bg-[#0f172a] rounded-b-[20px] z-50 flex items-center justify-center gap-2">
                             <div className="w-2 h-2 rounded-full bg-[#1e293b]" />
@@ -778,6 +775,158 @@ export default function InvestorDemoPage() {
                       </div>
                     </div>
                   )}
+                </div>
+                
+                {/* Mobile UI - Completely Redesigned from First Principles */}
+                <div className="flex-1 md:hidden flex flex-col bg-[#f8fafc]">
+                  {/* Mobile Top Bar */}
+                  <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shrink-0">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full" />
+                      <span className="text-sm font-semibold text-slate-900">Flutter Builder</span>
+                    </div>
+                    <span className="text-xs text-slate-500">InstaLite</span>
+                  </div>
+                  
+                  {/* Mobile Content Area */}
+                  <div className="flex-1 relative overflow-hidden">
+                    {/* Mobile Code View */}
+                    <div className={cn("absolute inset-0 transition-all duration-300", mobileViewTab === "code" ? "translate-x-0" : mobileViewTab === "files" ? "-translate-x-full" : "translate-x-full")}>
+                      <div className="h-full flex flex-col">
+                        {/* Code Editor Header */}
+                        <div className="bg-slate-900 px-4 py-3 flex items-center justify-between shrink-0">
+                          <div className="flex items-center gap-2">
+                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <span className="text-xs font-medium text-white/80 truncate max-w-[160px]">{selectedFile?.path || 'lib/main.dart'}</span>
+                          </div>
+                          <div className="flex gap-1.5">
+                            <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
+                            <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
+                          </div>
+                        </div>
+                        
+                        {/* Code Content */}
+                        <div className="flex-1 overflow-auto p-4 bg-[#1e1e1e]" style={{ fontFamily: "'Fira Code', monospace", fontSize: '12px', lineHeight: '1.6' }}>
+                          {selectedFile && fileContent ? (
+                            highlightDartCode(fileContent)
+                          ) : (
+                            <div className="flex flex-col items-center justify-center h-full text-slate-500">
+                              <FolderOpen className="w-10 h-10 mb-2 opacity-50" />
+                              <p className="text-xs">Tap files to view code</p>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Stats Bar */}
+                        <div className="bg-white border-t border-slate-200 px-4 py-3 shrink-0">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div>
+                                <span className="text-[10px] text-slate-500 uppercase tracking-wide">Compression</span>
+                                <span className="ml-2 text-sm font-bold text-slate-900">{COMPRESSION_RATIO}%</span>
+                              </div>
+                              <div className="h-4 w-px bg-slate-200" />
+                              <div>
+                                <span className="text-[10px] text-slate-500 uppercase tracking-wide">Lines</span>
+                                <span className="ml-2 text-sm font-bold text-slate-900">{TOTAL_GENERATED_LINES.toLocaleString()}</span>
+                              </div>
+                            </div>
+                            <button onClick={() => setMobileViewTab("files")} className="flex items-center gap-1.5 text-xs font-medium text-sky-600">
+                              <FolderOpen className="w-4 h-4" />
+                              Files
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Mobile Files View - Bottom Sheet Style */}
+                    <div className={cn("absolute inset-0 transition-all duration-300 bg-white", mobileViewTab === "files" ? "translate-x-0" : "translate-x-full")}>
+                      <div className="h-full flex flex-col">
+                        <div className="bg-slate-900 px-4 py-3 flex items-center justify-between shrink-0">
+                          <span className="text-sm font-semibold text-white">Project Files</span>
+                          <button onClick={() => setMobileViewTab("code")} className="text-white/60 hover:text-white">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                          </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto">
+                          <FileTree
+                            files={FILE_STRUCTURE}
+                            selectedFile={selectedFile?.path || null}
+                            onFileSelect={(file) => { handleFileSelect(file); setMobileViewTab("code"); }}
+                            expandedFolders={expandedFolders}
+                            toggleFolder={toggleFolder}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Mobile Preview View */}
+                    <div className={cn("absolute inset-0 transition-all duration-300", mobileViewTab === "preview" ? "translate-x-0" : "translate-x-full")}>
+                      <div className="h-full flex flex-col bg-gradient-to-b from-sky-100 to-sky-200">
+                        {/* Preview Controls */}
+                        <div className="bg-white/80 backdrop-blur-lg px-4 py-3 flex items-center justify-between shrink-0 border-b border-white/50">
+                          <span className="text-sm font-semibold text-slate-900">Preview</span>
+                          <div className="flex items-center gap-2">
+                            <div className="flex bg-slate-100 p-1 rounded-lg">
+                              <button onClick={() => setIsMobile(false)} className={cn("px-3 py-1.5 rounded-md text-xs font-medium transition-all", !isMobile ? "bg-white text-slate-900 shadow-sm" : "text-slate-500")}>
+                                Desktop
+                              </button>
+                              <button onClick={() => setIsMobile(true)} className={cn("px-3 py-1.5 rounded-md text-xs font-medium transition-all", isMobile ? "bg-white text-slate-900 shadow-sm" : "text-slate-500")}>
+                                Mobile
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Device Frame */}
+                        <div className="flex-1 flex items-center justify-center p-4">
+                          <div 
+                            className={cn(
+                              "relative bg-white rounded-[40px] shadow-2xl overflow-hidden transition-all duration-500",
+                              isMobile ? "w-[280px] h-[580px] border-[10px] border-slate-900" : "w-full max-w-3xl h-full max-h-[700px] border-4 border-white/50"
+                            )}
+                          >
+                            {/* Notch */}
+                            {isMobile && (
+                              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[100px] h-[24px] bg-slate-900 rounded-b-[16px] z-50 flex items-center justify-center">
+                                <div className="w-2 h-2 rounded-full bg-slate-700" />
+                              </div>
+                            )}
+                            
+                            <iframe src="/flutter-demo/web/index.html" className="w-full h-full border-0" />
+                          </div>
+                        </div>
+                        
+                        {/* Bottom Action Bar */}
+                        <div className="bg-white/90 backdrop-blur-lg px-4 py-4 shrink-0 border-t border-white/50">
+                          <button className="w-full py-3 bg-slate-900 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Export App
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Mobile Bottom Tab Bar */}
+                  <div className="bg-white border-t border-slate-200 px-2 py-2 shrink-0">
+                    <div className="flex justify-around">
+                      <button onClick={() => setMobileViewTab("code")} className={cn("flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all", mobileViewTab === "code" ? "text-sky-600" : "text-slate-400")}>
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                        <span className="text-[10px] font-medium">Code</span>
+                      </button>
+                      <button onClick={() => setMobileViewTab("preview")} className={cn("flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all", mobileViewTab === "preview" ? "text-sky-600" : "text-slate-400")}>
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                        <span className="text-[10px] font-medium">Preview</span>
+                      </button>
+                      <button className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl text-slate-400">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span className="text-[10px] font-medium">Export</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             )}
