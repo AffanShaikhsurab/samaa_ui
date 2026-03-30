@@ -128,13 +128,38 @@ function FlutterPreview({ viewport }: { viewport: Viewport }) {
   const containerHeight = isMobile ? "h-[700px]" : "h-[800px]";
 
   return (
-    <div className={cn("bg-white rounded-[32px] overflow-hidden border border-slate-200 shadow-2xl transition-all duration-500", containerWidth, containerHeight)}>
-      <iframe
-        src="/flutter-demo/web/index.html"
-        className="w-full h-full border-0"
-        title="Flutter App Preview"
-        allow="accelerometer; camera; encrypted-media; geolocation; gyroscope; microphone; midi; clipboard-read; clipboard-write"
-      />
+    <div className={cn("bg-gradient-to-br from-slate-900 via-slate-800 to-black rounded-[32px] overflow-hidden border border-white/10 shadow-2xl transition-all duration-500", containerWidth, containerHeight)}>
+      <div className="h-full flex flex-col">
+        <div className="flex-1 flex items-center justify-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-pink-500/10 to-transparent" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[580px] bg-gradient-to-br from-slate-800 to-slate-900 rounded-[40px] border-4 border-slate-700 shadow-2xl overflow-hidden">
+            <div className="h-full flex flex-col bg-black">
+              <div className="h-12 bg-black/90 flex items-center justify-center border-b border-white/5">
+                <div className="w-2 h-2 rounded-full bg-white/20" />
+              </div>
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-400 via-pink-500 to-purple-500 mx-auto mb-4 flex items-center justify-center">
+                    <span className="text-4xl font-bold text-white">IG</span>
+                  </div>
+                  <p className="text-white/50 text-sm font-medium">Instagram Clone</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
+            <a
+              href="http://localhost:3002"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+            >
+              <Play className="w-6 h-6 fill-current" />
+              Launch Full App
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
