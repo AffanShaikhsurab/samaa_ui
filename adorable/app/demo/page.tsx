@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   Loader2, Sparkles, CheckCircle2, Play,
-  FolderOpen,
+  FolderOpen, MessageCircle,
   ChevronRight, ChevronDown, GripVertical,
   File, Folder
 } from "lucide-react";
@@ -326,9 +326,18 @@ export default function InvestorDemoPage() {
   const [isResizingCode, setIsResizingCode] = useState(false);
   const [codeEditorExpanded, setCodeEditorExpanded] = useState(false);
   const [rightPanelView, setRightPanelView] = useState<"code" | "preview">("code");
-  const [mobileViewTab, setMobileViewTab] = useState<"code" | "files" | "preview">("code");
+  const [mobileViewTab, setMobileViewTab] = useState<"preview" | "code" | "chat">("preview");
+  const [mobileFilesSheetOpen, setMobileFilesSheetOpen] = useState(false);
   const [mobileScale, setMobileScale] = useState(1);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const codeEditorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobileViewport(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   const previewAreaRef = useRef<HTMLDivElement>(null);
 
   const calculateMobileScale = useCallback(() => {
@@ -522,7 +531,7 @@ export default function InvestorDemoPage() {
               exit={{ x: -420 }}
               ref={panelRef}
               className="h-full bg-white/10 backdrop-blur-[30px] border-r border-white/20 flex flex-col shadow-2xl z-20"
-              style={{ width: leftPanelWidth }}
+              style={{ width: isMobileViewport ? "100%" : leftPanelWidth }}
             >
               <header className="p-6 flex items-center justify-between border-b border-white/10">
                 <div className="flex items-center gap-3">
@@ -590,36 +599,90 @@ export default function InvestorDemoPage() {
 
             {stage === "intro" && (
               <motion.div key="intro" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.1 }} className="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto px-6">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full mb-8 border border-white/30 backdrop-blur-md">
-                  <Sparkles className="w-4 h-4 text-white" />
-                  <span className="text-xs font-semibold text-white uppercase tracking-widest">AI Engine v2.4</span>
+                {/* Desktop Intro - Hidden on Mobile */}
+                <div className="hidden md:flex flex-col items-center">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full mb-8 border border-white/30 backdrop-blur-md">
+                    <Sparkles className="w-4 h-4 text-white" />
+                    <span className="text-xs font-semibold text-white uppercase tracking-widest">AI Engine v2.4</span>
+                  </div>
+                  <h1 className="text-5xl font-bold text-white leading-[1.1] tracking-tight mb-6 drop-shadow-2xl">Prompt to App.<br />In Seconds.</h1>
+                  <p className="text-lg text-white/90 font-normal leading-relaxed mb-10">Watch ANCL transform human intent into 2,000+ lines of production Dart code instantly.</p>
+                  <button onClick={() => setStage("ancl")} className="px-12 py-5 bg-white text-sky-600 rounded-full font-bold text-lg shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
+                    Launch Builder <Play className="w-5 h-5 fill-current" />
+                  </button>
                 </div>
-                <h1 className="text-5xl font-bold text-white leading-[1.1] tracking-tight mb-6 drop-shadow-2xl">Prompt to App.<br />In Seconds.</h1>
-                <p className="text-lg text-white/90 font-normal leading-relaxed mb-10">Watch ANCL transform human intent into 2,000+ lines of production Dart code instantly.</p>
-                <button onClick={() => setStage("ancl")} className="px-12 py-5 bg-white text-sky-600 rounded-full font-bold text-lg shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
-                  Launch Builder <Play className="w-5 h-5 fill-current" />
-                </button>
+
+                {/* Mobile Intro - Redesigned from First Principles */}
+                <div className="md:hidden flex flex-col items-center w-full h-full justify-between py-12">
+                  <div className="flex flex-col items-center pt-8">
+                    <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-8 backdrop-blur-xl border border-white/20">
+                      <Sparkles className="w-8 h-8 text-white" />
+                    </div>
+                    <h1 className="text-4xl font-black text-white leading-tight tracking-tight mb-4 px-4">Create your app <br/><span className="text-sky-200">from a prompt.</span></h1>
+                    <p className="text-base text-white/70 font-medium px-8 leading-relaxed">Turn your ideas into production-ready Flutter code instantly with ANCL engine.</p>
+                  </div>
+                  
+                  <div className="w-full px-6 pb-4">
+                    <button 
+                      onClick={() => setStage("ancl")} 
+                      className="w-full py-5 bg-white text-sky-600 rounded-2xl font-bold text-lg shadow-[0_20px_40px_rgba(0,0,0,0.2)] active:scale-95 transition-all flex items-center justify-center gap-3"
+                    >
+                      Start Building <ChevronRight className="w-5 h-5" />
+                    </button>
+                    <p className="mt-6 text-[10px] text-white/40 uppercase tracking-[2px] font-bold">Powered by Samaa AI v2.4</p>
+                  </div>
+                </div>
               </motion.div>
             )}
 
             {stage === "building" && (
               <motion.div key="building" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full flex flex-col items-center justify-center px-6">
-                <div className="relative w-[300px] h-[200px] flex items-center justify-center animate-[float-hero_6s_ease-in-out_infinite]">
-                  <div className="aura-ring aura-ring-1" />
-                  <div className="aura-ring aura-ring-2" />
-                  <div className="blob blob-1" />
-                  <div className="blob blob-2" />
-                  <div className="blob blob-3" />
-                  <div className="cloud-core animate-[core-shimmer_2s_ease-in-out_infinite alternate]" />
+                {/* Desktop Building - Hidden on Mobile */}
+                <div className="hidden md:flex flex-col items-center">
+                  <div className="relative w-[300px] h-[200px] flex items-center justify-center animate-[float-hero_6s_ease-in-out_infinite]">
+                    <div className="aura-ring aura-ring-1" />
+                    <div className="aura-ring aura-ring-2" />
+                    <div className="blob blob-1" />
+                    <div className="blob blob-2" />
+                    <div className="blob blob-3" />
+                    <div className="cloud-core animate-[core-shimmer_2s_ease-in-out_infinite alternate]" />
+                  </div>
+                  <div className="mt-16 text-center z-10">
+                    <h2 className="text-4xl font-bold text-white tracking-tight mb-3">Manifesting your vision</h2>
+                    <div className="flex items-center justify-center gap-2 text-white/90">
+                      <span>{BUILD_STEPS[currentBuildStep].label}</span>
+                      <div className="flex gap-1 ml-2">
+                        <div className="w-1.5 h-1.5 bg-white rounded-full animate-[typing_1.4s_infinite]" />
+                        <div className="w-1.5 h-1.5 bg-white rounded-full animate-[typing_1.4s_infinite_0.2s]" />
+                        <div className="w-1.5 h-1.5 bg-white rounded-full animate-[typing_1.4s_infinite_0.4s]" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="mt-16 text-center z-10">
-                  <h2 className="text-4xl font-bold text-white tracking-tight mb-3">Manifesting your vision</h2>
-                  <div className="flex items-center justify-center gap-2 text-white/90">
-                    <span>{BUILD_STEPS[currentBuildStep].label}</span>
-                    <div className="flex gap-1 ml-2">
-                      <div className="w-1.5 h-1.5 bg-white rounded-full animate-[typing_1.4s_infinite]" />
-                      <div className="w-1.5 h-1.5 bg-white rounded-full animate-[typing_1.4s_infinite_0.2s]" />
-                      <div className="w-1.5 h-1.5 bg-white rounded-full animate-[typing_1.4s_infinite_0.4s]" />
+
+                {/* Mobile Building - Redesigned from First Principles */}
+                <div className="md:hidden flex flex-col items-center w-full">
+                  <div className="relative w-48 h-48 flex items-center justify-center mb-20">
+                    <div className="absolute inset-0 bg-white/5 rounded-full blur-3xl animate-pulse" />
+                    <div className="cloud-core w-24 h-24 animate-[core-shimmer_2s_ease-in-out_infinite alternate]" />
+                    <div className="absolute -inset-4 border-2 border-white/10 rounded-full animate-[spin_8s_linear_infinite]" />
+                    <div className="absolute -inset-8 border border-white/5 rounded-full animate-[spin_12s_linear_infinite_reverse]" />
+                  </div>
+                  
+                  <div className="w-full max-w-xs space-y-8">
+                    <div className="text-center">
+                      <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Generating App</h2>
+                      <p className="text-sm text-white/50 font-medium">{BUILD_STEPS[currentBuildStep].label}</p>
+                    </div>
+                    
+                    {/* Native Progress Bar */}
+                    <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                      <motion.div 
+                        className="h-full bg-white shadow-[0_0_15px_rgba(255,255,255,0.5)]"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(currentBuildStep + 1) / BUILD_STEPS.length * 100}%` }}
+                        transition={{ duration: 0.5 }}
+                      />
                     </div>
                   </div>
                 </div>
@@ -777,121 +840,165 @@ export default function InvestorDemoPage() {
                   )}
                 </div>
                 
-                {/* Mobile UI - Completely Redesigned from First Principles */}
-                <div className="flex-1 md:hidden flex flex-col bg-[#f8fafc]">
-                  {/* Mobile Content Area */}
-                  <div className="flex-1 relative overflow-hidden">
-                    {/* Mobile Code View */}
-                    <div className={cn("absolute inset-0 transition-all duration-300", mobileViewTab === "code" ? "translate-x-0" : mobileViewTab === "files" ? "-translate-x-full" : "translate-x-full")}>
-                      <div className="h-full flex flex-col">
-                        {/* Code Editor Header */}
-                        <div className="bg-slate-900 px-4 py-3 flex items-center justify-between shrink-0">
-                          <div className="flex items-center gap-2">
-                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                            <span className="text-xs font-medium text-white/80 truncate max-w-[160px]">{selectedFile?.path || 'lib/main.dart'}</span>
+                {/* Mobile UI - Redesigned from First Principles */}
+                <div className="flex-1 md:hidden flex flex-col bg-white">
+                  {/* Immersive Content Area */}
+                  <div className="flex-1 relative overflow-hidden bg-[#f8fafc]">
+                    
+                    {/* Native Preview View (Default) */}
+                    <div className={cn("absolute inset-0 transition-all duration-300 ease-out", mobileViewTab === "preview" ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none")}>
+                      <div className="h-full flex flex-col bg-white">
+                        <div className="flex-1 relative">
+                          <iframe src="/flutter-demo/web/index.html" className="w-full h-full border-0" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Native Code View */}
+                    <div className={cn("absolute inset-0 transition-all duration-300 ease-out", mobileViewTab === "code" ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none")}>
+                      <div className="h-full flex flex-col bg-[#1e1e1e]">
+                        {/* IDE Header */}
+                        <div className="px-4 py-3 bg-[#252526] border-b border-white/5 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <File className="w-4 h-4 text-sky-400" />
+                            <span className="text-xs font-semibold text-white/90 truncate max-w-[180px]">{selectedFile?.path || 'lib/main.dart'}</span>
                           </div>
-                          <div className="flex gap-1.5">
-                            <div className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
-                            <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-                          </div>
+                          <button onClick={() => setMobileFilesSheetOpen(true)} className="px-3 py-1.5 bg-white/5 rounded-md text-[10px] font-bold text-white/70 hover:bg-white/10 active:scale-95 transition-all flex items-center gap-2 uppercase tracking-wider">
+                            <FolderOpen className="w-3.5 h-3.5" /> Files
+                          </button>
                         </div>
                         
-                        {/* Code Content */}
-                        <div className="flex-1 overflow-auto p-4 bg-[#1e1e1e]" style={{ fontFamily: "'Fira Code', monospace", fontSize: '12px', lineHeight: '1.6' }}>
+                        {/* Editor Content */}
+                        <div className="flex-1 overflow-auto p-4 scrollbar-hide" style={{ fontFamily: "'Fira Code', monospace", fontSize: '13px', lineHeight: '1.6' }}>
                           {selectedFile && fileContent ? (
                             highlightDartCode(fileContent)
                           ) : (
-                            <div className="flex flex-col items-center justify-center h-full text-slate-500">
-                              <FolderOpen className="w-10 h-10 mb-2 opacity-50" />
-                              <p className="text-xs">Tap files to view code</p>
+                            <div className="h-full flex flex-col items-center justify-center text-white/20">
+                              <File className="w-12 h-12 mb-4 opacity-10" />
+                              <p className="text-sm font-medium">Select a file from project explorer</p>
                             </div>
                           )}
                         </div>
+
+                        {/* Status Bar */}
+                        <div className="px-4 py-2 bg-[#007acc] flex items-center justify-between text-white/90">
+                          <div className="flex items-center gap-4 text-[10px] font-medium">
+                            <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Ready</span>
+                            <span>{TOTAL_GENERATED_LINES.toLocaleString()} lines</span>
+                          </div>
+                          <span className="text-[10px] font-medium opacity-70">Dart • Flutter</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Native Chat View */}
+                    <div className={cn("absolute inset-0 transition-all duration-300 ease-out", mobileViewTab === "chat" ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none")}>
+                      <div className="h-full flex flex-col bg-white">
+                        {/* Chat Header */}
+                        <div className="px-6 py-4 border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-10">
+                          <h3 className="text-sm font-bold text-slate-900">Refine with AI</h3>
+                          <p className="text-[10px] text-slate-500 font-medium">Describe changes to your app</p>
+                        </div>
                         
-                        {/* Stats Bar */}
-                        <div className="bg-white border-t border-slate-200 px-4 py-3 shrink-0">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <div>
-                                <span className="text-[10px] text-slate-500 uppercase tracking-wide">Compression</span>
-                                <span className="ml-2 text-sm font-bold text-slate-900">{COMPRESSION_RATIO}%</span>
-                              </div>
-                              <div className="h-4 w-px bg-slate-200" />
-                              <div>
-                                <span className="text-[10px] text-slate-500 uppercase tracking-wide">Lines</span>
-                                <span className="ml-2 text-sm font-bold text-slate-900">{TOTAL_GENERATED_LINES.toLocaleString()}</span>
-                              </div>
+                        {/* Chat Messages Placeholder */}
+                        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                          <div className="flex gap-3">
+                            <div className="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center shrink-0">
+                              <Sparkles className="w-4 h-4 text-sky-600" />
                             </div>
-                            <button onClick={() => setMobileViewTab("files")} className="flex items-center gap-1.5 text-xs font-medium text-sky-600">
-                              <FolderOpen className="w-4 h-4" />
-                              Files
+                            <div className="bg-slate-50 rounded-2xl rounded-tl-none p-4 text-sm text-slate-700 font-medium leading-relaxed">
+                              I've generated a production-ready Instagram clone for you. What would you like to tweak?
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Input Area */}
+                        <div className="p-4 border-t border-slate-100 bg-white">
+                          <div className="relative">
+                            <input 
+                              type="text" 
+                              placeholder="Type a prompt..." 
+                              className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-medium placeholder:text-slate-400 focus:ring-2 focus:ring-sky-500 transition-all"
+                            />
+                            <button className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-sky-500 text-white rounded-xl flex items-center justify-center shadow-lg active:scale-95 transition-all">
+                              <ChevronRight className="w-5 h-5" />
                             </button>
                           </div>
                         </div>
                       </div>
                     </div>
-                    
-                    {/* Mobile Files View - Bottom Sheet Style */}
-                    <div className={cn("absolute inset-0 transition-all duration-300 bg-white", mobileViewTab === "files" ? "translate-x-0" : "translate-x-full")}>
-                      <div className="h-full flex flex-col">
-                        <div className="bg-slate-900 px-4 py-3 flex items-center justify-between shrink-0">
-                          <span className="text-sm font-semibold text-white">Project Files</span>
-                          <button onClick={() => setMobileViewTab("code")} className="text-white/60 hover:text-white">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
-                          </button>
-                        </div>
-                        <div className="flex-1 overflow-y-auto">
-                          <FileTree
-                            files={FILE_STRUCTURE}
-                            selectedFile={selectedFile?.path || null}
-                            onFileSelect={(file) => { handleFileSelect(file); setMobileViewTab("code"); }}
-                            expandedFolders={expandedFolders}
-                            toggleFolder={toggleFolder}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Mobile Preview View */}
-                    <div className={cn("absolute inset-0 transition-all duration-300", mobileViewTab === "preview" ? "translate-x-0" : "translate-x-full")}>
-                      <div className="h-full flex flex-col bg-gradient-to-b from-sky-100 to-sky-200">
-                        {/* Device Frame */}
-                        <div className="flex-1 flex items-center justify-center p-4">
-                          <div 
-                            className={cn(
-                              "relative bg-white rounded-[40px] shadow-2xl overflow-hidden transition-all duration-500",
-                              isMobile ? "w-[280px] h-[580px] border-[10px] border-slate-900" : "w-full max-w-3xl h-full max-h-[700px] border-4 border-white/50"
-                            )}
-                          >
-                            {/* Notch */}
-                            {isMobile && (
-                              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[100px] h-[24px] bg-slate-900 rounded-b-[16px] z-50 flex items-center justify-center">
-                                <div className="w-2 h-2 rounded-full bg-slate-700" />
-                              </div>
-                            )}
 
-                            <iframe src="/flutter-demo/web/index.html" className="w-full h-full border-0" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    {/* Bottom Sheet File Explorer (Mobile Native Pattern) */}
+                    <AnimatePresence>
+                      {mobileFilesSheetOpen && (
+                        <>
+                          <motion.div 
+                            initial={{ opacity: 0 }} 
+                            animate={{ opacity: 1 }} 
+                            exit={{ opacity: 0 }} 
+                            onClick={() => setMobileFilesSheetOpen(false)}
+                            className="absolute inset-0 bg-black/40 backdrop-blur-sm z-40" 
+                          />
+                          <motion.div 
+                            initial={{ y: "100%" }} 
+                            animate={{ y: 0 }} 
+                            exit={{ y: "100%" }} 
+                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                            className="absolute bottom-0 inset-x-0 h-[70%] bg-white rounded-t-[32px] shadow-[0_-20px_40px_rgba(0,0,0,0.1)] z-50 flex flex-col overflow-hidden"
+                          >
+                            <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto my-3 shrink-0" />
+                            <div className="px-6 py-4 flex items-center justify-between border-b border-slate-50 shrink-0">
+                              <h3 className="text-lg font-bold text-slate-900">Project Files</h3>
+                              <button onClick={() => setMobileFilesSheetOpen(false)} className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center">
+                                <ChevronDown className="w-5 h-5 text-slate-400" />
+                              </button>
+                            </div>
+                            <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
+                              <FileTree
+                                files={FILE_STRUCTURE}
+                                selectedFile={selectedFile?.path || null}
+                                onFileSelect={(file) => { handleFileSelect(file); setMobileFilesSheetOpen(false); setMobileViewTab("code"); }}
+                                expandedFolders={expandedFolders}
+                                toggleFolder={toggleFolder}
+                              />
+                            </div>
+                          </motion.div>
+                        </>
+                      )}
+                    </AnimatePresence>
                   </div>
                   
-                  {/* Mobile Bottom Tab Bar */}
-                  <div className="bg-white border-t border-slate-200 px-2 py-2 shrink-0">
-                    <div className="flex justify-around">
-                      <button onClick={() => setMobileViewTab("code")} className={cn("flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all", mobileViewTab === "code" ? "text-sky-600" : "text-slate-400")}>
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                        <span className="text-[10px] font-medium">Code</span>
+                  {/* Native Bottom Tab Bar */}
+                  <div className="bg-white border-t border-slate-100 px-6 py-4 shrink-0 pb-safe-offset-4">
+                    <div className="flex items-center justify-between max-w-sm mx-auto">
+                      <button 
+                        onClick={() => setMobileViewTab("preview")} 
+                        className={cn("flex flex-col items-center gap-1.5 transition-all duration-300", mobileViewTab === "preview" ? "text-sky-600 scale-110" : "text-slate-400 hover:text-slate-600")}
+                      >
+                        <div className={cn("w-12 h-7 rounded-full flex items-center justify-center transition-all", mobileViewTab === "preview" ? "bg-sky-50" : "bg-transparent")}>
+                          <Play className={cn("w-5 h-5", mobileViewTab === "preview" ? "fill-sky-600" : "")} />
+                        </div>
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Preview</span>
                       </button>
-                      <button onClick={() => setMobileViewTab("preview")} className={cn("flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all", mobileViewTab === "preview" ? "text-sky-600" : "text-slate-400")}>
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                        <span className="text-[10px] font-medium">Preview</span>
+
+                      <button 
+                        onClick={() => setMobileViewTab("code")} 
+                        className={cn("flex flex-col items-center gap-1.5 transition-all duration-300", mobileViewTab === "code" ? "text-sky-600 scale-110" : "text-slate-400 hover:text-slate-600")}
+                      >
+                        <div className={cn("w-12 h-7 rounded-full flex items-center justify-center transition-all", mobileViewTab === "code" ? "bg-sky-50" : "bg-transparent")}>
+                          <File className="w-5 h-5" />
+                        </div>
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Code</span>
                       </button>
-                      <button className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl text-slate-400">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        <span className="text-[10px] font-medium">Export</span>
+
+                      <button 
+                        onClick={() => setMobileViewTab("chat")} 
+                        className={cn("flex flex-col items-center gap-1.5 transition-all duration-300", mobileViewTab === "chat" ? "text-sky-600 scale-110" : "text-slate-400 hover:text-slate-600")}
+                      >
+                        <div className={cn("w-12 h-7 rounded-full flex items-center justify-center transition-all", mobileViewTab === "chat" ? "bg-sky-50" : "bg-transparent")}>
+                          <MessageCircle className="w-5 h-5" />
+                        </div>
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Chat</span>
                       </button>
                     </div>
                   </div>
