@@ -1,790 +1,788 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { SkyBackground } from "@/components/sky-background";
 import {
-  Loader2,
-  FileCode2,
-  Sparkles,
-  CheckCircle2,
-  Play,
-  Monitor,
-  Smartphone,
-  ArrowLeft,
-  Zap,
+  Loader2, Sparkles, CheckCircle2, Play,
+  FolderOpen,
+  ChevronRight, ChevronDown, GripVertical,
+  File, Folder
 } from "lucide-react";
-import "../flutter/landing.css";
+import { encode } from "gpt-tokenizer";
 
 const DEMO_ANCL_CODE = `#n:InstaLite,d
- 
- M:Story{ 
-   id:int, 
-   label:str, 
-   viewed:bool=false 
- } 
- 
- M:Post{ 
-   id:int, 
-   author:str, 
-   handle:str, 
-   caption:str, 
-   mediaLabel:str, 
-   liked:bool=false, 
-   saved:bool=false 
- } 
- 
- M:ExploreItem{ 
-   id:int, 
-   title:str, 
-   subtitle:str 
- } 
- 
- M:Comment{ 
-   id:int, 
-   postId:int, 
-   author:str, 
-   body:str 
- } 
- 
- N:InstaBloc{ 
-   activeTab:String="home", 
-   shellTab:String="home", 
-   stories:List<Story>=[], 
-   selectedStoryIndex:int=0, 
-   posts:List<Post>=[], 
-   exploreItems:List<ExploreItem>=[], 
-   searchQuery:String="", 
-   searchResults:List<ExploreItem>=[], 
-   recentSearches:List<String>=[], 
-   selectedStoryLabel:String="Story", 
-   selectedPostId:int=0, 
-   comments:List<Comment>=[], 
-   visibleComments:List<Comment>=[], 
-   commentDraft:String="", 
-   selectedMediaLabel:String="No media selected yet", 
-   draftCaption:String="", 
-   publishStatus:String="", 
-   isPublishing:bool=false, 
-   profileAvatarText:String="AV", 
-   profileTitle:String="@ari.vega", 
-   profileSubtitle:String="Art direction, campaigns, and motion-led product stories", 
-   isFollowingProfile:bool=false, 
-   profilePosts:int=42, 
-   followers:int=12800, 
-   following:int=318 
- 
-   init() { 
-     stories = [Story(id:1, label:"You"), Story(id:2, label:"Mia"), Story(id:3, label:"Noah"), Story(id:4, label:"Ari"), Story(id:5, label:"Zoe", viewed:true)]; 
-     posts = [Post(id:1, author:"Mia Chen", handle:"@mia.design", caption:"Golden hour, strong contrast.", mediaLabel:"Studio shoot"), Post(id:2, author:"Noah Patel", handle:"@noah.codes", caption:"Building social surfaces.", mediaLabel:"Launch board", liked:true), Post(id:3, author:"Luna Rivera", handle:"@luna.motion", caption:"Motion studies.", mediaLabel:"Color study", saved:true)]; 
-     exploreItems = [ExploreItem(id:1, title:"Design systems", subtitle:"Reusable social surfaces"), ExploreItem(id:2, title:"Creator motion", subtitle:"Short-form storytelling"), ExploreItem(id:3, title:"Product launch", subtitle:"Campaign assets"), ExploreItem(id:4, title:"Editorial portrait", subtitle:"Photography direction"), ExploreItem(id:5, title:"Brand motion", subtitle:"Story-first loops"), ExploreItem(id:6, title:"UI moodboard", subtitle:"Dark surfaces")]; 
-     searchResults = exploreItems; 
-     comments = [Comment(id:1, postId:1, author:"Noah", body:"Polished."), Comment(id:2, postId:1, author:"Ari", body:"Love this."), Comment(id:3, postId:2, author:"Mia", body:"ANCL primitives.") ]; 
-   } 
- 
-   SetPrimaryTab(tab:String) { activeTab = tab; shellTab = tab; } 
-   CloseOverlay() { activeTab = shellTab; } 
-   OpenStory(label:String) { selectedStoryLabel = label; selectedStoryIndex = stories.indexWhere((s) => s.label == label); activeTab = "story"; } 
-   NextStory() { if (selectedStoryIndex < stories.length - 1) { selectedStoryIndex++; selectedStoryLabel = stories[selectedStoryIndex].label; } else { CloseOverlay(); } } 
-   OpenComments(postId:int) { selectedPostId = postId; activeTab = "comments"; } 
-   ToggleLike(postId:int) { posts = posts.map((p) => p.id == postId ? Post(id:p.id, author:p.author, handle:p.handle, caption:p.caption, mediaLabel:p.mediaLabel, liked:!p.liked, saved:p.saved) : p).toList(); } 
-   ToggleSave(postId:int) { posts = posts.map((p) => p.id == postId ? Post(id:p.id, author:p.author, handle:p.handle, caption:p.caption, mediaLabel:p.mediaLabel, liked:p.liked, saved:!p.saved) : p).toList(); } 
-   ToggleProfileFollow() { isFollowingProfile = !isFollowingProfile; followers = isFollowingProfile ? followers + 1 : followers - 1; } 
- 
-   get activeTabIndex(): shellTab == "home" ? 0 : shellTab == "search" ? 1 : shellTab == "create" ? 2 : shellTab == "profile" ? 3 : 0; 
- } 
- 
- S(MainRoute)B[switch(InstaBloc.state.activeTab) { case "story": D{const StoryView()} case "comments": D{const CommentsView()} default: D{const ShellView()} }] 
- 
- S(ShellView)B[C[Exp[IStack($InstaBloc.state.activeTabIndex)[D{const HomeView()}, D{const SearchView()}, D{const CreateView()}, D{const ProfileView()}]], BottomTabShell(activeTab:$InstaBloc.state.shellTab, onHome:InstaBloc.SetPrimaryTab("home"), onSearch:InstaBloc.SetPrimaryTab("search"), onCreate:InstaBloc.SetPrimaryTab("create"), onProfile:InstaBloc.SetPrimaryTab("profile"))]] 
- 
- S(HomeView)B[L[Ctr(p:16)[R(main:spaceBetween, cross:center)[T(Instagram, c:white, size:28, fw:800), R(gap:8)[ActionPill(label:"Create", onTap:InstaBloc.SetPrimaryTab("create")), ActionPill(label:"Profile", onTap:InstaBloc.SetPrimaryTab("profile"))]]], Ctr(p:0x16x8x16)[StoryTray(stories:$InstaBloc.state.stories, onStoryTap:InstaBloc.OpenStory)], Spc(h:8), for($InstaBloc.state.posts as $post)[Ctr(p:0x16x16x16)[PostCard(author:$post.author, handle:$post.handle, caption:$post.caption, liked:$post.liked, saved:$post.saved, onLike:InstaBloc.ToggleLike($post.id), onComment:InstaBloc.OpenComments($post.id), onSave:InstaBloc.ToggleSave($post.id))]]]] 
- 
- S(SearchView)B[L[Ctr(p:16)[SearchSurface(title:"Explore", queryText:$InstaBloc.state.searchQuery, onQueryChanged:InstaBloc.SetSearchQuery)], Ctr(p:0x16x12x16)[ExploreGrid(items:$InstaBloc.state.searchResults)]]] 
- 
- S(CreateView)B[L[Ctr(p:16)[MediaComposer(title:"New post", selectedLabel:$InstaBloc.state.selectedMediaLabel, draftCaption:$InstaBloc.state.draftCaption, captionPlaceholder:"Write a caption", onCaptionChanged:InstaBloc.UpdateDraftCaption)]]] 
- 
- S(ProfileView)B[L[Ctr(p:16)[ProfileHeader(avatarText:$InstaBloc.state.profileAvatarText, title:$InstaBloc.state.profileTitle, subtitle:$InstaBloc.state.profileSubtitle, posts:$InstaBloc.state.profilePosts, followers:$InstaBloc.state.followers, following:$InstaBloc.state.following)], Ctr(p:0x16x0x16)[ProfileActionBar(primaryLabel:{$InstaBloc.state.isFollowingProfile ? "Following" : "Follow"}, onPrimary:InstaBloc.ToggleProfileFollow)]]] 
- 
- S(StoryView)B[C[Exp[Ctr(p:0)[StoryViewer(title:$InstaBloc.state.selectedStoryLabel, onPrimary:InstaBloc.CloseOverlay, onSecondary:InstaBloc.NextStory)]]]] 
- 
- S(CommentsView)B[L[Ctr(p:16)[SectionHeader(title:"Comments")], for($InstaBloc.state.visibleComments as $comment)[Ctr(p:0x16x12x16)[CommentRow(author:$comment.author, body:$comment.body)]]]]`;
+
+ M:Story{ id:int, label:str, viewed:bool=false }
+ M:Post{ id:int, author:str, handle:str, caption:str, mediaLabel:str, liked:bool=false, saved:bool=false }
+ M:ExploreItem{ id:int, title:str, subtitle:str }
+ M:Comment{ id:int, postId:int, author:str, body:str }
+
+ N:InstaBloc{
+   activeTab:String="home", shellTab:String="home", stories:List<Story>=[], posts:List<Post>=[],
+   exploreItems:List<ExploreItem>=[], searchResults:List<ExploreItem>=[],
+   profileTitle:String="@ari.vega", followers:int=12800, following:int=318
+
+   init(){
+     stories = [Story(id:1, label:"You"), Story(id:2, label:"Mia"), Story(id:3, label:"Noah"), Story(id:4, label:"Ari"), Story(id:5, label:"Zoe", viewed:true)];
+     posts = [Post(id:1, author:"Mia Chen", handle:"@mia.design", caption:"Golden hour.", mediaLabel:"Studio shoot"), Post(id:2, author:"Noah Patel", handle:"@noah.codes", caption:"Building social surfaces.", mediaLabel:"Launch board", liked:true)];
+     exploreItems = [ExploreItem(id:1, title:"Design systems", subtitle:"Reusable surfaces")];
+     searchResults = exploreItems;
+     comments = [Comment(id:1, postId:1, author:"Noah", body:"Polished.")];
+   }
+
+   SetPrimaryTab(tab:String){ activeTab = tab; shellTab = tab; }
+   OpenStory(label:String){ activeTab = "story"; }
+   ToggleLike(postId:int){ posts = posts.map((p) => p.id == postId ? Post(id:p.id, author:p.author, handle:p.handle, caption:p.caption, mediaLabel:p.mediaLabel, liked:!p.liked, saved:p.saved) : p).toList(); }
+ }
+
+ S(MainRoute)B[switch(InstaBloc.state.activeTab){ case "story": D{const StoryView()} default: D{const ShellView()} }]
+ S(ShellView)B[C[Exp[IStack($InstaBloc.state.activeTabIndex)[D{const HomeView()}]], BottomTabShell()]]
+ S(HomeView)B[L[Ctr(p:16)[R(main:spaceBetween)[T(Instagram, size:28, fw:800)]], StoryTray(), for($post)[PostCard()]]]`;
 
 const BUILD_STEPS = [
-  { label: "Creating sandbox", duration: 1200 },
-  { label: "Installing dependencies", duration: 1800 },
-  { label: "Compiling ANCL", duration: 2200 },
-  { label: "Building Flutter app", duration: 2800 },
-  { label: "Optimizing assets", duration: 1000 },
-  { label: "Deploying preview", duration: 1500 },
+  { label: "Creating sandbox", explanation: "Isolated cloud environment" },
+  { label: "Installing dependencies", explanation: "Flutter SDK + BloC + 25 packages" },
+  { label: "Compiling ANCL to Flutter", explanation: "Transpiling DSL to Dart AST" },
+  { label: "Building web assets", explanation: "Compiling to HTML/CSS/JS" },
+  { label: "Optimizing bundle", explanation: "Tree-shaking & minification" },
+  { label: "Deploying to cloud", explanation: "Live preview ready! 🚀" },
 ];
 
-type Viewport = "desktop" | "mobile";
+const FILE_STRUCTURE = [
+  {
+    name: "lib",
+    type: "folder" as const,
+    children: [
+      { name: "main.dart", type: "file" as const, path: "lib/main.dart", lines: 34 },
+      {
+        name: "bloc", type: "folder" as const,
+        children: [
+          { name: "insta_bloc_bloc.dart", type: "file" as const, path: "lib/bloc/insta_bloc_bloc.dart", lines: 450 },
+          { name: "insta_bloc_event.dart", type: "file" as const, path: "lib/bloc/insta_bloc_event.dart", lines: 126 },
+          { name: "insta_bloc_state.dart", type: "file" as const, path: "lib/bloc/insta_bloc_state.dart", lines: 226 },
+        ]
+      },
+      {
+        name: "data", type: "folder" as const,
+        children: [
+          {
+            name: "models", type: "folder" as const,
+            children: [
+              { name: "comment.dart", type: "file" as const, path: "lib/data/models/comment.dart", lines: 45 },
+              { name: "conversation_message.dart", type: "file" as const, path: "lib/data/models/conversation_message.dart", lines: 52 },
+              { name: "conversation_thread.dart", type: "file" as const, path: "lib/data/models/conversation_thread.dart", lines: 48 },
+              { name: "explore_item.dart", type: "file" as const, path: "lib/data/models/explore_item.dart", lines: 38 },
+              { name: "highlight_item.dart", type: "file" as const, path: "lib/data/models/highlight_item.dart", lines: 42 },
+              { name: "post.dart", type: "file" as const, path: "lib/data/models/post.dart", lines: 55 },
+              { name: "relationship_user.dart", type: "file" as const, path: "lib/data/models/relationship_user.dart", lines: 44 },
+              { name: "story.dart", type: "file" as const, path: "lib/data/models/story.dart", lines: 36 },
+            ]
+          },
+          {
+            name: "repositories", type: "folder" as const,
+            children: [
+              { name: "insta_bloc_local_repository.dart", type: "file" as const, path: "lib/data/repositories/insta_bloc_local_repository.dart", lines: 89 },
+            ]
+          }
+        ]
+      },
+      {
+        name: "presentation", type: "folder" as const,
+        children: [
+          {
+            name: "components", type: "folder" as const,
+            children: [
+              { name: "action_pill.dart", type: "file" as const, path: "lib/presentation/components/action_pill.dart", lines: 67 },
+              { name: "bottom_tab_shell.dart", type: "file" as const, path: "lib/presentation/components/bottom_tab_shell.dart", lines: 124 },
+              { name: "comment_composer.dart", type: "file" as const, path: "lib/presentation/components/comment_composer.dart", lines: 95 },
+              { name: "comment_row.dart", type: "file" as const, path: "lib/presentation/components/comment_row.dart", lines: 78 },
+              { name: "comment_sheet_header.dart", type: "file" as const, path: "lib/presentation/components/comment_sheet_header.dart", lines: 52 },
+              { name: "conversation_composer.dart", type: "file" as const, path: "lib/presentation/components/conversation_composer.dart", lines: 88 },
+              { name: "conversation_header.dart", type: "file" as const, path: "lib/presentation/components/conversation_header.dart", lines: 64 },
+              { name: "conversation_hint.dart", type: "file" as const, path: "lib/presentation/components/conversation_hint.dart", lines: 45 },
+              { name: "conversation_thread_row.dart", type: "file" as const, path: "lib/presentation/components/conversation_thread_row.dart", lines: 92 },
+              { name: "explore_grid.dart", type: "file" as const, path: "lib/presentation/components/explore_grid.dart", lines: 156 },
+              { name: "explore_tile.dart", type: "file" as const, path: "lib/presentation/components/explore_tile.dart", lines: 89 },
+              { name: "inbox_category_tabs.dart", type: "file" as const, path: "lib/presentation/components/inbox_category_tabs.dart", lines: 58 },
+              { name: "inbox_header.dart", type: "file" as const, path: "lib/presentation/components/inbox_header.dart", lines: 71 },
+              { name: "media_composer.dart", type: "file" as const, path: "lib/presentation/components/media_composer.dart", lines: 102 },
+              { name: "media_detail_viewer.dart", type: "file" as const, path: "lib/presentation/components/media_detail_viewer.dart", lines: 134 },
+              { name: "media_grid.dart", type: "file" as const, path: "lib/presentation/components/media_grid.dart", lines: 78 },
+              { name: "message_bubble.dart", type: "file" as const, path: "lib/presentation/components/message_bubble.dart", lines: 98 },
+              { name: "message_notice_banner.dart", type: "file" as const, path: "lib/presentation/components/message_notice_banner.dart", lines: 48 },
+              { name: "post_actions.dart", type: "file" as const, path: "lib/presentation/components/post_actions.dart", lines: 112 },
+              { name: "post_card.dart", type: "file" as const, path: "lib/presentation/components/post_card.dart", lines: 178 },
+              { name: "post_draft_preview.dart", type: "file" as const, path: "lib/presentation/components/post_draft_preview.dart", lines: 67 },
+              { name: "post_header.dart", type: "file" as const, path: "lib/presentation/components/post_header.dart", lines: 89 },
+              { name: "post_media.dart", type: "file" as const, path: "lib/presentation/components/post_media.dart", lines: 94 },
+              { name: "post_meta.dart", type: "file" as const, path: "lib/presentation/components/post_meta.dart", lines: 71 },
+              { name: "privacy_state_badge.dart", type: "file" as const, path: "lib/presentation/components/privacy_state_badge.dart", lines: 42 },
+              { name: "profile_action_row.dart", type: "file" as const, path: "lib/presentation/components/profile_action_row.dart", lines: 86 },
+              { name: "profile_content_tabs.dart", type: "file" as const, path: "lib/presentation/components/profile_content_tabs.dart", lines: 154 },
+              { name: "profile_highlights_row.dart", type: "file" as const, path: "lib/presentation/components/profile_highlights_row.dart", lines: 98 },
+              { name: "profile_identity_header.dart", type: "file" as const, path: "lib/presentation/components/profile_identity_header.dart", lines: 112 },
+              { name: "profile_metrics_bar.dart", type: "file" as const, path: "lib/presentation/components/profile_metrics_bar.dart", lines: 76 },
+              { name: "profile_stat.dart", type: "file" as const, path: "lib/presentation/components/profile_stat.dart", lines: 58 },
+              { name: "profile_top_bar.dart", type: "file" as const, path: "lib/presentation/components/profile_top_bar.dart", lines: 94 },
+              { name: "publish_action_bar.dart", type: "file" as const, path: "lib/presentation/components/publish_action_bar.dart", lines: 82 },
+              { name: "quick_reaction_bar.dart", type: "file" as const, path: "lib/presentation/components/quick_reaction_bar.dart", lines: 65 },
+              { name: "reel_actions.dart", type: "file" as const, path: "lib/presentation/components/reel_actions.dart", lines: 108 },
+              { name: "reel_card.dart", type: "file" as const, path: "lib/presentation/components/reel_card.dart", lines: 142 },
+              { name: "reel_pager.dart", type: "file" as const, path: "lib/presentation/components/reel_pager.dart", lines: 118 },
+              { name: "relationship_action_chip.dart", type: "file" as const, path: "lib/presentation/components/relationship_action_chip.dart", lines: 72 },
+              { name: "search_surface.dart", type: "file" as const, path: "lib/presentation/components/search_surface.dart", lines: 135 },
+              { name: "section_header.dart", type: "file" as const, path: "lib/presentation/components/section_header.dart", lines: 48 },
+              { name: "social_list_sheet.dart", type: "file" as const, path: "lib/presentation/components/social_list_sheet.dart", lines: 165 },
+              { name: "social_tab_bar.dart", type: "file" as const, path: "lib/presentation/components/social_tab_bar.dart", lines: 270 },
+              { name: "story_bubble.dart", type: "file" as const, path: "lib/presentation/components/story_bubble.dart", lines: 88 },
+              { name: "story_tray.dart", type: "file" as const, path: "lib/presentation/components/story_tray.dart", lines: 145 },
+              { name: "story_viewer.dart", type: "file" as const, path: "lib/presentation/components/story_viewer.dart", lines: 189 },
+              { name: "surface_header.dart", type: "file" as const, path: "lib/presentation/components/surface_header.dart", lines: 62 },
+            ]
+          },
+          {
+            name: "screens", type: "folder" as const,
+            children: [
+              { name: "comments_view_screen.dart", type: "file" as const, path: "lib/presentation/screens/comments_view_screen.dart", lines: 156 },
+              { name: "create_view_screen.dart", type: "file" as const, path: "lib/presentation/screens/create_view_screen.dart", lines: 178 },
+              { name: "followers_view_screen.dart", type: "file" as const, path: "lib/presentation/screens/followers_view_screen.dart", lines: 134 },
+              { name: "following_view_screen.dart", type: "file" as const, path: "lib/presentation/screens/following_view_screen.dart", lines: 128 },
+              { name: "home_view_screen.dart", type: "file" as const, path: "lib/presentation/screens/home_view_screen.dart", lines: 198 },
+              { name: "inbox_view_screen.dart", type: "file" as const, path: "lib/presentation/screens/inbox_view_screen.dart", lines: 167 },
+              { name: "main_route_screen.dart", type: "file" as const, path: "lib/presentation/screens/main_route_screen.dart", lines: 85 },
+              { name: "media_viewer_view_screen.dart", type: "file" as const, path: "lib/presentation/screens/media_viewer_view_screen.dart", lines: 145 },
+              { name: "messages_view_screen.dart", type: "file" as const, path: "lib/presentation/screens/messages_view_screen.dart", lines: 189 },
+              { name: "profile_view_screen.dart", type: "file" as const, path: "lib/presentation/screens/profile_view_screen.dart", lines: 173 },
+              { name: "reels_view_screen.dart", type: "file" as const, path: "lib/presentation/screens/reels_view_screen.dart", lines: 156 },
+              { name: "search_view_screen.dart", type: "file" as const, path: "lib/presentation/screens/search_view_screen.dart", lines: 142 },
+              { name: "shell_view_screen.dart", type: "file" as const, path: "lib/presentation/screens/shell_view_screen.dart", lines: 92 },
+              { name: "story_view_screen.dart", type: "file" as const, path: "lib/presentation/screens/story_view_screen.dart", lines: 168 },
+            ]
+          }
+        ]
+      }
+    ]
+  }
+];
 
-function FlutterPreview({ viewport }: { viewport: Viewport }) {
-  const isMobile = viewport === "mobile";
-  const containerWidth = isMobile ? "w-[375px]" : "w-full max-w-[1280px]";
-  const containerHeight = isMobile ? "h-[700px]" : "h-[800px]";
+const ANCL_TOKENS = encode(DEMO_ANCL_CODE).length;
+const REAL_FLUTTER_TOKENS = 52169;
+const COMPRESSION_RATIO = Math.round((1 - ANCL_TOKENS / REAL_FLUTTER_TOKENS) * 100);
+const TOTAL_GENERATED_LINES = 2250;
 
-  return (
-    <div className={cn("bg-gradient-to-br from-slate-900 via-slate-800 to-black rounded-[32px] overflow-hidden border border-white/10 shadow-2xl transition-all duration-500", containerWidth, containerHeight)}>
-      <div className="h-full flex flex-col">
-        <div className="flex-1 flex items-center justify-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-pink-500/10 to-transparent" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[580px] bg-gradient-to-br from-slate-800 to-slate-900 rounded-[40px] border-4 border-slate-700 shadow-2xl overflow-hidden">
-            <div className="h-full flex flex-col bg-black">
-              <div className="h-12 bg-black/90 flex items-center justify-center border-b border-white/5">
-                <div className="w-2 h-2 rounded-full bg-white/20" />
-              </div>
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-yellow-400 via-pink-500 to-purple-500 mx-auto mb-4 flex items-center justify-center">
-                    <span className="text-4xl font-bold text-white">IG</span>
-                  </div>
-                  <p className="text-white/50 text-sm font-medium">Instagram Clone</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-            <a
-              href="http://localhost:3002"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
-            >
-              <Play className="w-6 h-6 fill-current" />
-              Launch Full App
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+interface FileNode {
+  name: string;
+  type: "file" | "folder";
+  path?: string;
+  lines?: number;
+  children?: FileNode[];
 }
 
-function InstagramPreview({ viewport }: { viewport: Viewport }) {
-  const [activeTab, setActiveTab] = useState("home");
-  const [stories, setStories] = useState([
-    { id: 1, label: "You", viewed: false },
-    { id: 2, label: "Mia", viewed: false },
-    { id: 3, label: "Noah", viewed: false },
-    { id: 4, label: "Ari", viewed: false },
-    { id: 5, label: "Zoe", viewed: true },
-  ]);
-  const [posts, setPosts] = useState([
-    { id: 1, author: "Mia Chen", handle: "@mia.design", caption: "Golden hour, strong contrast.", mediaLabel: "Studio shoot", liked: false, saved: false },
-    { id: 2, author: "Noah Patel", handle: "@noah.codes", caption: "Building social surfaces.", mediaLabel: "Launch board", liked: true, saved: false },
-    { id: 3, author: "Luna Rivera", handle: "@luna.motion", caption: "Motion studies.", mediaLabel: "Color study", liked: false, saved: true },
-  ]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showStory, setShowStory] = useState(false);
-  const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
+function highlightDartCode(code: string): React.ReactNode[] {
+  return code.split("\n").map((line, i) => {
+    let result: React.ReactNode[] = [];
+    let remaining = line;
+    let keyIdx = 0;
 
-  const toggleLike = (postId: number) => {
-    setPosts(posts.map(p => p.id === postId ? { ...p, liked: !p.liked } : p));
-  };
+    const patterns: { regex: RegExp; className: string }[] = [
+      { regex: /\b(import|export|class|extends|implements|with|mixin|typedef|enum|void|int|String|bool|var|dynamic|final|const|static|abstract|override| covariant|late|required|this|super|return|if|else|for|while|do|switch|case|break|continue|new|await|async|future|stream|set|get|operator)\b/g, className: "kw" },
+      { regex: /'[^']*'|"[^"]*"/g, className: "st" },
+      { regex: /\b[A-Z][a-zA-Z0-9_]*\b/g, className: "cl" },
+    ];
 
-  const toggleSave = (postId: number) => {
-    setPosts(posts.map(p => p.id === postId ? { ...p, saved: !p.saved } : p));
-  };
+    const segments: { text: string; className: string }[] = [];
+    let cursor = 0;
 
-  const nextStory = () => {
-    if (currentStoryIndex < stories.length - 1) {
-      setCurrentStoryIndex(currentStoryIndex + 1);
-      setStories(stories.map((s, i) => i === currentStoryIndex + 1 ? { ...s, viewed: true } : s));
-    } else {
-      setShowStory(false);
+    const allMatches: { start: number; end: number; text: string; className: string }[] = [];
+
+    patterns.forEach(({ regex, className }) => {
+      let match;
+      const r = new RegExp(regex.source, 'g');
+      while ((match = r.exec(line)) !== null) {
+        allMatches.push({ start: match.index, end: match.index + match[0].length, text: match[0], className });
+      }
+    });
+
+    allMatches.sort((a, b) => a.start - b.start);
+
+    const filtered: typeof allMatches = [];
+    let lastEnd = -1;
+    allMatches.forEach(m => {
+      if (m.start >= lastEnd) {
+        filtered.push(m);
+        lastEnd = m.end;
+      }
+    });
+
+    lastEnd = 0;
+    filtered.forEach(m => {
+      if (m.start > lastEnd) {
+        segments.push({ text: line.slice(lastEnd, m.start), className: "" });
+      }
+      segments.push({ text: m.text, className: m.className });
+      lastEnd = m.end;
+    });
+    if (lastEnd < line.length) {
+      segments.push({ text: line.slice(lastEnd), className: "" });
     }
-  };
 
-  const exploreItems = [
-    { id: 1, title: "Design systems", subtitle: "Reusable surfaces" },
-    { id: 2, title: "Creator motion", subtitle: "Short-form" },
-    { id: 3, title: "Product launch", subtitle: "Campaign assets" },
-    { id: 4, title: "Editorial portrait", subtitle: "Photography" },
-    { id: 5, title: "Brand motion", subtitle: "Story-first loops" },
-    { id: 6, title: "UI moodboard", subtitle: "Dark surfaces" },
-  ];
+    if (segments.length === 0) {
+      segments.push({ text: line || " ", className: "" });
+    }
 
-  const filteredItems = searchQuery
-    ? exploreItems.filter(i => i.title.toLowerCase().includes(searchQuery.toLowerCase()))
-    : exploreItems;
+    return (
+      <div key={i} className="flex">
+        <span className="ln w-[35px] text-right pr-4 text-[#475569] select-none shrink-0">{i + 1}</span>
+        <span className="flex-1">
+          {segments.map((seg, j) => (
+            <span key={j} className={seg.className}>{seg.text}</span>
+          ))}
+        </span>
+      </div>
+    );
+  });
+}
 
-  const isMobile = viewport === "mobile";
-  const containerWidth = isMobile ? "w-full max-w-[375px]" : "w-full max-w-[1280px]";
-  const containerHeight = isMobile ? "h-[700px]" : "h-[800px]";
-
+function FileTree({ files, level = 0, selectedFile, onFileSelect, expandedFolders, toggleFolder }: {
+  files: FileNode[];
+  level?: number;
+  selectedFile: string | null;
+  onFileSelect: (file: FileNode) => void;
+  expandedFolders: Set<string>;
+  toggleFolder: (path: string) => void;
+}) {
   return (
-    <div className={cn("bg-gradient-to-b from-slate-900 via-slate-800 to-black rounded-[32px] overflow-hidden border border-white/10 shadow-2xl transition-all duration-500", containerWidth, containerHeight)}>
-      {showStory ? (
-        <div className="h-full bg-black flex flex-col">
-          <div className="flex items-center gap-3 p-4 bg-black/80 backdrop-blur-xl border-b border-white/5">
-            <button onClick={() => setShowStory(false)} className="text-white/60 hover:text-white">
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 via-pink-500 to-purple-500 flex items-center justify-center text-white text-sm font-bold">
-              {stories[currentStoryIndex].label[0]}
-            </div>
-            <div>
-              <p className="text-white font-semibold text-sm">{stories[currentStoryIndex].label}</p>
-              <p className="text-white/50 text-xs">{stories[currentStoryIndex].label === "You" ? "Your story" : `${stories[currentStoryIndex].label}'s story`}</p>
-            </div>
-          </div>
-          <div className="flex-1 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center relative cursor-pointer" onClick={nextStory}>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-            <div className="text-center z-10">
-              <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-yellow-400 via-pink-500 to-purple-500 mx-auto mb-4 flex items-center justify-center text-white/30">
-                <span className="text-6xl font-bold opacity-50">{stories[currentStoryIndex].label[0]}</span>
-              </div>
-              <p className="text-white/50 text-sm">{stories[currentStoryIndex].label}'s story</p>
-            </div>
-            <button className="absolute right-6 bottom-6 px-6 py-3 bg-white text-black font-semibold rounded-full" onClick={(e) => { e.stopPropagation(); nextStory(); }}>
-              {currentStoryIndex < stories.length - 1 ? "Next" : "Close"}
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="h-full flex flex-col bg-black">
-          {activeTab === "home" && (
-            <>
-              <header className="flex items-center justify-between p-4 bg-black/90 backdrop-blur-xl border-b border-white/5">
-                <h1 className="text-white font-bold text-xl tracking-tight">Instagram</h1>
-                <div className="flex gap-3">
-                  <button onClick={() => setActiveTab("create")} className="text-white/70 hover:text-white">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                  </button>
-                  <button onClick={() => setActiveTab("profile")} className="text-white/70 hover:text-white">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                  </button>
-                </div>
-              </header>
-              <div className="flex gap-4 p-4 overflow-x-auto border-b border-white/5 bg-black/50 no-scrollbar">
-                {stories.map((story, i) => (
-                  <div key={story.id} className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer" onClick={() => { setCurrentStoryIndex(i); setShowStory(true); }}>
-                    <div className={cn("w-14 h-14 rounded-full p-[3px]", story.viewed ? "bg-slate-600" : "bg-gradient-to-br from-yellow-400 via-pink-500 to-purple-500")}>
-                      <div className="w-full h-full rounded-full bg-black flex items-center justify-center">
-                        <span className="text-white text-sm font-semibold">{story.label[0]}</span>
-                      </div>
-                    </div>
-                    <span className="text-white/70 text-xs">{story.label}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="flex-1 overflow-y-auto no-scrollbar">
-                {posts.map(post => (
-                  <div key={post.id} className="border-b border-white/5">
-                    <div className="flex items-center gap-3 p-3">
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-sm font-semibold">
-                        {post.author[0]}
-                      </div>
-                      <div>
-                        <p className="text-white font-semibold text-sm">{post.handle}</p>
-                        <p className="text-white/50 text-xs">{post.author}</p>
-                      </div>
-                    </div>
-                    <div className="aspect-square bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-                      <span className="text-white/20 text-sm font-medium">{post.mediaLabel}</span>
-                    </div>
-                    <div className="p-3">
-                      <div className="flex items-center gap-4 mb-3">
-                        <button onClick={() => toggleLike(post.id)} className={cn("transition-colors", post.liked ? "text-red-500" : "text-white/70 hover:text-white")}>
-                          <svg className="w-6 h-6" fill={post.liked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                        </button>
-                        <button className="text-white/70 hover:text-white">
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-                        </button>
-                        <button className="text-white/70 hover:text-white">
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-                        </button>
-                        <button onClick={() => toggleSave(post.id)} className={cn("ml-auto transition-colors", post.saved ? "text-yellow-500" : "text-white/70 hover:text-white")}>
-                          <svg className="w-6 h-6" fill={post.saved ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-                        </button>
-                      </div>
-                      <p className="text-white text-sm font-semibold mb-1">{post.author}</p>
-                      <p className="text-white/70 text-sm">{post.caption}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-          {activeTab === "search" && (
-            <>
-              <header className="p-4 bg-black/90 backdrop-blur-xl border-b border-white/5">
-                <h1 className="text-white font-bold text-xl mb-3">Explore</h1>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search creators, posts, or ideas"
-                  className="w-full bg-white/10 text-white placeholder:text-white/40 rounded-xl px-4 py-2.5 text-sm outline-none border border-white/5 focus:border-white/20"
-                />
-              </header>
-              <div className="flex-1 overflow-y-auto p-4 no-scrollbar">
-                <div className="grid grid-cols-2 gap-3">
-                  {filteredItems.map(item => (
-                    <div key={item.id} className="aspect-square bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-4 flex flex-col justify-end border border-white/5 hover:border-white/20 transition-colors cursor-pointer">
-                      <div className="bg-gradient-to-br from-pink-500 to-purple-600 w-10 h-10 rounded-lg mb-2 flex items-center justify-center">
-                        <Sparkles className="w-5 h-5 text-white" />
-                      </div>
-                      <p className="text-white font-semibold text-sm">{item.title}</p>
-                      <p className="text-white/50 text-xs">{item.subtitle}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-          {activeTab === "create" && (
-            <div className="flex-1 flex flex-col items-center justify-center p-8 bg-black">
-              <div className="w-full max-w-sm">
-                <h1 className="text-white font-bold text-2xl mb-2 text-center">New post</h1>
-                <p className="text-white/50 text-sm text-center mb-8">Draft and publish from one flow</p>
-                <div className="border-2 border-dashed border-white/20 rounded-[24px] p-12 flex flex-col items-center justify-center mb-4">
-                  <svg className="w-12 h-12 text-white/30 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                  <p className="text-white/50 text-sm font-medium">Select media</p>
-                </div>
-                <button className="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold rounded-xl">
-                  Publish draft
-                </button>
-              </div>
-            </div>
-          )}
-          {activeTab === "profile" && (
-            <>
-              <header className="p-6 bg-black/90 backdrop-blur-xl border-b border-white/5">
-                <div className="flex items-center gap-4">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 via-pink-500 to-purple-500 flex items-center justify-center text-white text-2xl font-bold">
-                    AV
-                  </div>
-                  <div className="flex-1">
-                    <h2 className="text-white font-bold text-lg">@ari.vega</h2>
-                    <p className="text-white/50 text-sm">Art direction, campaigns</p>
-                  </div>
-                </div>
-                <div className="flex justify-around mt-6">
-                  <div className="text-center">
-                    <p className="text-white font-bold text-lg">42</p>
-                    <p className="text-white/50 text-xs">posts</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-white font-bold text-lg">12.8K</p>
-                    <p className="text-white/50 text-xs">followers</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-white font-bold text-lg">318</p>
-                    <p className="text-white/50 text-xs">following</p>
-                  </div>
-                </div>
-              </header>
-              <div className="flex-1 overflow-y-auto p-4 no-scrollbar">
-                <div className="grid grid-cols-3 gap-1">
-                  {posts.map(post => (
-                    <div key={post.id} className="aspect-square bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center border border-white/5">
-                      <span className="text-white/20 text-xs">{post.mediaLabel.split(" ")[0]}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-          <nav className="flex justify-around py-3 bg-black/90 border-t border-white/5">
-            {[
-              { key: "home", icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /> },
-              { key: "search", icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /> },
-              { key: "create", icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /> },
-              { key: "profile", icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /> },
-            ].map(item => (
+    <div className="select-none scrollbar-hide">
+      {files.map((file) => {
+        const isExpanded = expandedFolders.has(file.path || file.name);
+        const isSelected = selectedFile === file.path;
+
+        if (file.type === "folder") {
+          return (
+            <div key={file.path || file.name}>
               <button
-                key={item.key}
-                onClick={() => setActiveTab(item.key)}
-                className={cn("p-2 transition-colors", activeTab === item.key ? "text-white" : "text-white/40")}
+                onClick={() => toggleFolder(file.path || file.name)}
+                className={cn(
+                  "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[14px] font-semibold transition-all hover:bg-black/[0.04]",
+                )}
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">{item.icon}</svg>
+                {isExpanded ? (
+                  <ChevronDown className="w-[18px] h-[18px] shrink-0" style={{ color: '#374151' }} />
+                ) : (
+                  <ChevronRight className="w-[18px] h-[18px] shrink-0" style={{ color: '#374151' }} />
+                )}
+                <Folder className="w-[18px] h-[18px] shrink-0" style={{ color: '#374151' }} />
+                <span className="truncate" style={{ color: '#374151' }}>{file.name}</span>
               </button>
-            ))}
-          </nav>
-        </div>
-      )}
+              {isExpanded && file.children && (
+                <div className="ml-5 pl-4 border-l-2 border-black/[0.08]">
+                  <FileTree
+                    files={file.children}
+                    level={level + 1}
+                    selectedFile={selectedFile}
+                    onFileSelect={onFileSelect}
+                    expandedFolders={expandedFolders}
+                    toggleFolder={toggleFolder}
+                  />
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        return (
+          <button
+            key={file.path}
+            onClick={() => onFileSelect(file)}
+            className={cn(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[14px] font-semibold transition-all mb-0.5",
+              isSelected ? "bg-[#1e293b] text-white shadow-lg" : "hover:bg-black/[0.04]"
+            )}
+            style={!isSelected ? { color: '#374151' } : {}}
+          >
+            <File className="w-[18px] h-[18px] shrink-0" />
+            <span className="truncate flex-1 text-left">{file.name}</span>
+            <span className="text-xs opacity-60 shrink-0">{file.lines}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-export default function DemoPage() {
-  const [stage, setStage] = useState<"input" | "ancl" | "building" | "preview">("input");
-  const [inputValue, setInputValue] = useState("");
-  const [viewport, setViewport] = useState<Viewport>("desktop");
+export default function InvestorDemoPage() {
+  const [stage, setStage] = useState<"intro" | "ancl" | "building" | "editor">("intro");
   const [currentBuildStep, setCurrentBuildStep] = useState(0);
   const [codeLines, setCodeLines] = useState<string[]>([]);
   const [codeComplete, setCodeComplete] = useState(false);
-  const codeContainerRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false); // Desktop by default in editor
+  const [leftPanelWidth, setLeftPanelWidth] = useState(420);
+  const [isDragging, setIsDragging] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
+  const [fileContent, setFileContent] = useState<string>("");
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(["lib", "lib/bloc", "lib/data", "lib/data/models", "lib/data/repositories", "lib/presentation", "lib/presentation/components", "lib/presentation/screens"]));
+  const [codeEditorHeight, setCodeEditorHeight] = useState(400);
+  const [isResizingCode, setIsResizingCode] = useState(false);
+  const [codeEditorExpanded, setCodeEditorExpanded] = useState(false);
+  const [rightPanelView, setRightPanelView] = useState<"code" | "preview">("code");
+  const [mobileScale, setMobileScale] = useState(1);
+  const codeEditorRef = useRef<HTMLDivElement>(null);
+  const previewAreaRef = useRef<HTMLDivElement>(null);
 
-  const handleStartDemo = () => {
-    if (!inputValue.trim()) return;
-    setStage("ancl");
-  };
+  const calculateMobileScale = useCallback(() => {
+    if (!previewAreaRef.current || !isMobile) {
+      setMobileScale(1);
+      return;
+    }
+    const container = previewAreaRef.current;
+    const padding = 48;
+    const availableHeight = container.clientHeight - padding;
+    const availableWidth = container.clientWidth - padding;
+    const targetHeight = 896;
+    const targetWidth = 414;
+    const scaleH = availableHeight / targetHeight;
+    const scaleW = availableWidth / targetWidth;
+    const newScale = Math.min(scaleH, scaleW, 1);
+    setMobileScale(newScale);
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (stage === "editor" && rightPanelView === "preview") {
+      const timer = setTimeout(calculateMobileScale, 50);
+      window.addEventListener("resize", calculateMobileScale);
+      return () => {
+        window.removeEventListener("resize", calculateMobileScale);
+        clearTimeout(timer);
+      };
+    }
+  }, [stage, rightPanelView, calculateMobileScale]);
+
+  useEffect(() => {
+    if (isMobile && rightPanelView === "preview") {
+      calculateMobileScale();
+    }
+  }, [isMobile, rightPanelView, calculateMobileScale]);
+
+  const handleCodeResizeMouseDown = useCallback(() => {
+    setIsResizingCode(true);
+  }, []);
+
+  const handleCodeResizeMouseMove = useCallback((e: MouseEvent) => {
+    if (!isResizingCode || !codeEditorRef.current) return;
+    const rect = codeEditorRef.current.parentElement?.getBoundingClientRect();
+    if (!rect) return;
+    const newHeight = e.clientY - rect.top;
+    setCodeEditorHeight(Math.max(200, Math.min(600, newHeight)));
+  }, [isResizingCode]);
+
+  const handleCodeResizeMouseUp = useCallback(() => {
+    setIsResizingCode(false);
+  }, []);
+
+  useEffect(() => {
+    if (isResizingCode) {
+      window.addEventListener("mousemove", handleCodeResizeMouseMove);
+      window.addEventListener("mouseup", handleCodeResizeMouseUp);
+      return () => {
+        window.removeEventListener("mousemove", handleCodeResizeMouseMove);
+        window.removeEventListener("mouseup", handleCodeResizeMouseUp);
+      };
+    }
+  }, [isResizingCode, handleCodeResizeMouseMove, handleCodeResizeMouseUp]);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseDown = useCallback(() => {
+    setIsDragging(true);
+  }, []);
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging || !panelRef.current) return;
+    const rect = panelRef.current.getBoundingClientRect();
+    const newWidth = e.clientX - rect.left;
+    setLeftPanelWidth(Math.max(280, Math.min(700, newWidth)));
+  }, [isDragging]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+      return () => {
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mouseup", handleMouseUp);
+      };
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp]);
+
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [codeLines]);
 
   useEffect(() => {
     if (stage !== "ancl") return;
-
-    const fullCode = DEMO_ANCL_CODE;
-    let lineIndex = 0;
-    const lines = fullCode.split("\n");
-
-    const interval = setInterval(() => {
-      if (lineIndex < lines.length) {
-        setCodeLines(lines.slice(0, lineIndex + 1));
-        lineIndex++;
-        if (codeContainerRef.current) {
-          codeContainerRef.current.scrollTop = codeContainerRef.current.scrollHeight;
-        }
+    const lines = DEMO_ANCL_CODE.split("\n");
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i < lines.length) {
+        setCodeLines(lines.slice(0, i + 1));
+        i++;
       } else {
         setCodeComplete(true);
-        clearInterval(interval);
-        setTimeout(() => setStage("building"), 1500);
+        clearInterval(timer);
       }
-    }, 25);
-
-    return () => clearInterval(interval);
+    }, 100);
+    return () => clearInterval(timer);
   }, [stage]);
 
   useEffect(() => {
     if (stage !== "building") return;
-
-    let stepIndex = 0;
-    const totalDuration = BUILD_STEPS.reduce((acc, step) => acc + step.duration, 0);
-    const stepDuration = totalDuration / BUILD_STEPS.length;
-
-    const interval = setInterval(() => {
-      if (stepIndex < BUILD_STEPS.length) {
-        setCurrentBuildStep(stepIndex);
-        stepIndex++;
+    let step = 0;
+    const timer = setInterval(() => {
+      if (step < BUILD_STEPS.length) {
+        setCurrentBuildStep(step);
+        step++;
       } else {
-        clearInterval(interval);
-        setTimeout(() => setStage("preview"), 500);
+        clearInterval(timer);
+        setTimeout(() => setStage("editor"), 1000);
       }
-    }, stepDuration);
-
-    return () => clearInterval(interval);
+    }, 1200);
+    return () => clearInterval(timer);
   }, [stage]);
 
+  const toggleFolder = useCallback((path: string) => {
+    setExpandedFolders(prev => {
+      const next = new Set(prev);
+      if (next.has(path)) next.delete(path);
+      else next.add(path);
+      return next;
+    });
+  }, []);
+
+  const handleFileSelect = useCallback(async (file: FileNode) => {
+    if (file.type !== "file" || !file.path) return;
+    setSelectedFile(file);
+    try {
+      const response = await fetch(`/generated-code/${file.path}`);
+      if (response.ok) {
+        const text = await response.text();
+        setFileContent(text);
+      } else {
+        setFileContent(`// File not found: ${file.path}`);
+      }
+    } catch {
+      setFileContent(`// Error loading file: ${file.path}`);
+    }
+  }, []);
+
   return (
-    <div className="sama-landing-page no-scrollbar">
-      <SkyBackground variant="landing" />
+    <div className="relative h-screen w-screen overflow-hidden bg-gradient-to-br from-[#6fbdfd] to-[#479ff8] font-sans" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap');
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-editorial { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(40px) saturate(120%); -webkit-backdrop-filter: blur(40px) saturate(120%); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06); }
+        .glass-card { background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(40px) saturate(120%); -webkit-backdrop-filter: blur(40px) saturate(120%); border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 28px; padding: 28px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06); }
+        .kw { color: #a78bfa; font-weight: 500; }
+        .st { color: #34d399; }
+        .cl { color: #60a5fa; font-weight: 500; }
+        .code-editor-resize { cursor: row-resize; }
+        @keyframes float-hero { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes core-shimmer { from { transform: scale(0.9); opacity: 0.6; } to { transform: scale(1.1); opacity: 1; } }
+        @keyframes rotate-aura { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.3; } 30% { transform: translateY(-6px); opacity: 1; } }
+        @keyframes pulse-blob { from { transform: scale(1); opacity: 0.4; } to { transform: scale(1.15); opacity: 0.7; } }
+        .aura-ring { position: absolute; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; animation: rotate-aura 15s linear infinite; }
+        .aura-ring-1 { width: 350px; height: 350px; opacity: 0.2; }
+        .aura-ring-2 { width: 450px; height: 450px; opacity: 0.1; animation-duration: 25s; animation-direction: reverse; }
+        .blob { position: absolute; background: white; border-radius: 50%; filter: blur(40px); opacity: 0.6; animation: pulse-blob 4s infinite alternate ease-in-out; }
+        .blob-1 { width: 180px; height: 180px; top: -20px; left: 20px; animation-delay: 0s; }
+        .blob-2 { width: 220px; height: 160px; top: 20px; right: -10px; opacity: 0.5; animation-delay: 1s; }
+        .blob-3 { width: 150px; height: 150px; bottom: -10px; left: 60px; opacity: 0.7; animation-delay: 2s; }
+        .cloud-core { position: absolute; width: 100px; height: 100px; background: white; border-radius: 50%; filter: blur(20px); box-shadow: 0 0 60px 20px white; z-index: 5; opacity: 0.8; }
+      `}</style>
 
-      <div className="cloud-burst-overlay" />
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <motion.div animate={{ x: [-40, 40], y: [-10, 10] }} transition={{ duration: 20, repeat: Infinity, repeatType: "mirror" }} className="absolute top-[-5%] left-[-5%] w-[800px] h-[500px] bg-white/40 blur-[100px] rounded-full" />
+        <motion.div animate={{ x: [40, -40], y: [10, -10] }} transition={{ duration: 25, repeat: Infinity, repeatType: "mirror" }} className="absolute bottom-[-10%] right-[-5%] w-[700px] h-[600px] bg-white/30 blur-[120px] rounded-full" />
+      </div>
 
-      <div className="content w-full flex flex-col items-center">
-        <nav className={cn(
-          "w-full max-w-[1400px] flex justify-between items-center px-6 md:px-12 py-6 z-50 transition-opacity duration-300",
-          stage !== "input" ? "opacity-0 pointer-events-none" : "opacity-100"
-        )}>
-          <div className="logo text-2xl font-extrabold tracking-tighter">samaa</div>
-          <div className="nav-links flex gap-6">
-            <a href="/flutter" className="text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors">Back to Builder</a>
-          </div>
-        </nav>
-
-        <AnimatePresence mode="wait">
-          {stage === "input" && (
-            <motion.section
-              key="input"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="hero flex flex-col items-center w-full max-w-[800px] px-6 text-center"
+      <div className="relative z-10 flex h-full w-full">
+        <AnimatePresence>
+          {(stage === "ancl" || stage === "building") && (
+            <motion.aside
+              initial={{ x: -420 }}
+              animate={{ x: 0 }}
+              exit={{ x: -420 }}
+              ref={panelRef}
+              className="h-full bg-white/10 backdrop-blur-[30px] border-r border-white/20 flex flex-col shadow-2xl z-20"
+              style={{ width: leftPanelWidth }}
             >
-              <div className="mb-12 unblur-reveal">
-                <h1 className="text-5xl md:text-8xl font-bold tracking-tight text-slate-900 mb-8 leading-[0.9] font-display">From Idea to App</h1>
-                <p className="subtitle text-xl md:text-2xl text-slate-600 font-medium max-w-2xl mx-auto">Watch ANCL transform natural language into production-ready Flutter applications</p>
-              </div>
-
-              <div className="workbench w-full glass-card p-8 flex flex-col gap-6 unblur-reveal [animation-delay:200ms]">
-                <textarea
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Ask Sama to build a custom Instagram like clone..."
-                  className="input-area w-full bg-transparent border-none outline-none text-lg md:text-xl text-slate-900 resize-none min-h-[120px] font-medium placeholder:text-slate-400 leading-relaxed"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleStartDemo();
-                    }
-                  }}
-                />
-                <div className="footer flex justify-between items-center pt-4 border-t border-black/5">
-                  <div className="kb-hint text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                    PRESS <span className="kb-key bg-black/5 px-1.5 py-0.5 rounded text-[10px]">ENTER</span> TO SUBMIT
-                  </div>
-                  <button
-                    onClick={handleStartDemo}
-                    disabled={!inputValue.trim()}
-                    className={cn(
-                      "btn-build bg-sky-600 text-white px-10 py-4 rounded-full font-bold text-sm transition-all shadow-xl hover:bg-sky-700 hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none select-none",
-                    )}
-                  >
-                    Generate App &rarr;
-                  </button>
+              <header className="p-6 flex items-center justify-between border-b border-white/10">
+                <div className="flex items-center gap-3">
+                  <span className="text-xl font-semibold text-white/90">Flutter Builder</span>
+                  <div className="w-2 h-2 bg-white rounded-full shadow-[0_0_10px_white]" />
                 </div>
-              </div>
-            </motion.section>
-          )}
-
-          {stage === "ancl" && (
-            <motion.div
-              key="ancl"
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="w-full max-w-[1200px] px-6 md:mt-12 flex flex-col gap-8"
-            >
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                {/* Code Editor Area */}
-                <div className="lg:col-span-3 glass-card overflow-hidden flex flex-col unblur-reveal">
-                  <div className="flex items-center justify-between px-6 py-4 border-b border-black/5 bg-white/40">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-red-400/80" />
-                      <div className="w-3 h-3 rounded-full bg-yellow-400/80" />
-                      <div className="w-3 h-3 rounded-full bg-green-400/80" />
-                    </div>
-                    <div className="flex items-center gap-2 text-slate-500 text-[11px] font-bold uppercase tracking-widest">
-                      <FileCode2 className="w-3.5 h-3.5" />
-                      insta_lite.ancl
-                      <span className="text-sky-500 ml-2">{Math.round((codeLines.length / DEMO_ANCL_CODE.split("\n").length) * 100)}%</span>
-                    </div>
-                  </div>
-                  <div ref={codeContainerRef} className="h-[500px] overflow-y-auto p-8 font-mono text-[13px] bg-slate-50/30 no-scrollbar">
-                    <pre className="text-slate-700 whitespace-pre-wrap">
-                      {codeLines.map((line, i) => (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.1 }}
-                          className={cn(
-                            "leading-[1.8]",
-                            line.startsWith("#") ? "text-purple-500 font-bold" :
-                            line.startsWith("M:") ? "text-sky-600 font-bold" :
-                            line.startsWith("N:") ? "text-amber-600 font-bold" :
-                            line.startsWith("S(") ? "text-pink-600 font-bold" :
-                            line.trim() === "}" || line.trim() === "]," || line.trim() === "])" ? "text-slate-400" :
-                            "text-slate-600"
-                          )}
-                        >
-                          {line || " "}
-                        </motion.div>
-                      ))}
-                      {!codeComplete && (
-                        <motion.span
-                          animate={{ opacity: [1, 0] }}
-                          transition={{ repeat: Infinity, duration: 0.5 }}
-                          className="text-sky-500 font-bold"
-                        >
-                          ▋
-                        </motion.span>
-                      )}
-                    </pre>
-                  </div>
-                </div>
-
-                {/* Status Sidebar Area */}
-                <div className="lg:col-span-2 flex flex-col gap-6 unblur-reveal [animation-delay:150ms]">
-                  <div className="glass-card p-8">
-                    <div className="flex items-center gap-4 mb-8">
-                      <div className="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center shadow-sm">
-                        <Sparkles className="w-6 h-6 text-sky-600" />
-                      </div>
-                      <div>
-                        <h3 className="text-slate-900 font-bold text-lg">ANCL Parser</h3>
-                        <p className="text-slate-500 text-xs font-medium">Transforming design language</p>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-8 h-8 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-bold text-slate-800">Model Definitions</p>
-                          <p className="text-[11px] text-slate-500 font-medium">Parsed 4 core entities</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-4">
-                        <div className={cn(
-                          "w-8 h-8 rounded-full flex items-center justify-center shrink-0 border transition-all duration-500",
-                          codeLines.length > 15 ? "bg-emerald-50 border-emerald-100" : "bg-slate-50 border-slate-100"
-                        )}>
-                          {codeLines.length > 15 ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />}
-                        </div>
-                        <div className="flex-1">
-                          <p className={cn("text-sm font-bold transition-colors", codeLines.length > 15 ? "text-slate-800" : "text-slate-400")}>Bloc Controller</p>
-                          <p className={cn("text-[11px] font-medium transition-colors", codeLines.length > 15 ? "text-slate-500" : "text-slate-300")}>Extracted state management</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-4">
-                        <div className={cn(
-                          "w-8 h-8 rounded-full flex items-center justify-center shrink-0 border transition-all duration-500",
-                          codeComplete ? "bg-emerald-50 border-emerald-100" : "bg-slate-50 border-slate-100"
-                        )}>
-                          {codeComplete ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />}
-                        </div>
-                        <div className="flex-1">
-                          <p className={cn("text-sm font-bold transition-colors", codeComplete ? "text-slate-800" : "text-slate-400")}>Screen Definitions</p>
-                          <p className={cn("text-[11px] font-medium transition-colors", codeComplete ? "text-slate-500" : "text-slate-300")}>Generated 8 UI components</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-sky-50/80 backdrop-blur-[20px] border border-sky-100/50 rounded-[32px] p-8 flex-1">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Zap className="w-5 h-5 text-sky-600" />
-                      <span className="text-slate-900 font-bold uppercase tracking-wider text-[11px]">System Status</span>
-                    </div>
-                    <p className="text-slate-600 text-sm leading-relaxed font-medium">
-                      ANCL is a high-level design language that abstracts away complex Flutter code into readable primitives. We're currently mapping your natural language prompt to a structured ANCL blueprint.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {stage === "building" && (
-            <motion.div
-              key="building"
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="w-full max-w-[600px] px-6 md:mt-24"
-            >
-              <div className="bg-white/65 backdrop-blur-[30px] border border-white/80 rounded-[40px] overflow-hidden shadow-2xl">
-                <div className="p-12 text-center border-b border-black/5 bg-white/20">
-                  <div className="relative w-24 h-24 mx-auto mb-8">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
-                      className="absolute inset-0 rounded-full border-4 border-slate-100 border-t-sky-500"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Loader2 className="w-10 h-10 text-sky-500 animate-spin" />
-                    </div>
-                  </div>
-                  <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">Compiling Blueprint</h2>
-                  <p className="text-slate-500 font-medium">Assembling production-ready Flutter code...</p>
-                </div>
-                
-                <div className="p-10 space-y-6">
-                  {BUILD_STEPS.map((step, i) => (
-                    <div key={step.label} className="flex items-center gap-5">
-                      <div className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 border",
-                        i < currentBuildStep ? "bg-emerald-50 border-emerald-100" :
-                        i === currentBuildStep ? "bg-sky-50 border-sky-100" :
-                        "bg-slate-50 border-slate-100"
-                      )}>
-                        {i < currentBuildStep ? (
-                          <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                        ) : i === currentBuildStep ? (
-                          <Loader2 className="w-5 h-5 text-sky-500 animate-spin" />
-                        ) : (
-                          <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <span className={cn(
-                          "text-sm font-bold transition-colors",
-                          i < currentBuildStep ? "text-emerald-600" :
-                          i === currentBuildStep ? "text-slate-900" :
-                          "text-slate-400"
-                        )}>
-                          {step.label}
-                        </span>
-                        {i === currentBuildStep && (
-                          <p className="text-[10px] text-sky-500 font-bold uppercase tracking-widest mt-0.5">In Progress</p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {stage === "preview" && (
-            <motion.div
-              key="preview"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="w-full max-w-[1400px] px-6 md:mt-8 space-y-8 flex flex-col items-center"
-            >
-              {/* Preview Header */}
-              <div className="w-full flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shadow-sm">
-                    <CheckCircle2 className="w-7 h-7 text-emerald-600" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Build Complete!</h2>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">App is live on Samaa Cloud</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2 bg-white/65 backdrop-blur-[20px] border border-white/80 rounded-full p-1.5 shadow-sm">
-                  <button
-                    onClick={() => setViewport("desktop")}
-                    className={cn(
-                      "flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all",
-                      viewport === "desktop" ? "bg-slate-900 text-white shadow-lg" : "text-slate-500 hover:text-slate-900"
-                    )}
-                  >
-                    <Monitor className="w-4 h-4" />
-                    Desktop
-                  </button>
-                  <button
-                    onClick={() => setViewport("mobile")}
-                    className={cn(
-                      "flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all",
-                      viewport === "mobile" ? "bg-slate-900 text-white shadow-lg" : "text-slate-500 hover:text-slate-900"
-                    )}
-                  >
-                    <Smartphone className="w-4 h-4" />
-                    Mobile
-                  </button>
-                </div>
-              </div>
-
-              {/* Preview Area */}
-              <div className="w-full flex justify-center py-4">
-                <FlutterPreview viewport={viewport} />
-              </div>
-
-              {/* Action Footer */}
-              <div className="flex flex-col md:flex-row items-center justify-center gap-4 w-full pt-8 border-t border-black/5">
-                <button
-                  onClick={() => window.open("https://github.com", "_blank")}
-                  className="flex items-center gap-3 px-8 py-4 bg-white/65 backdrop-blur-[20px] border border-white/80 text-slate-700 rounded-full font-bold hover:bg-white transition-all shadow-sm hover:shadow-md active:scale-[0.98] w-full md:w-auto justify-center"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" /></svg>
-                  Source Files
+                <button onClick={() => setStage("intro")} className="text-white/70 hover:text-white transition-colors text-sm font-medium">
+                  Back
                 </button>
-                <button 
-                  onClick={() => window.open("/flutter", "_self")}
-                  className="flex items-center gap-3 px-10 py-4 bg-slate-900 text-white rounded-full font-bold hover:bg-black transition-all shadow-xl hover:shadow-2xl active:scale-[0.98] w-full md:w-auto justify-center"
-                >
-                  <Play className="w-5 h-5 fill-current" />
-                  Launch Workspace
-                </button>
+              </header>
+
+              <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-5 scrollbar-hide">
+                <AnimatePresence>
+                  <>
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="self-end max-w-[85%] bg-white px-5 py-4 rounded-3xl rounded-br-md shadow-lg text-slate-800 text-[15px] font-medium ml-auto">
+                      "Build me an Instagram clone app with stories, posts, and a profile section"
+                    </motion.div>
+
+                    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="max-w-full bg-[#1e293b]/85 backdrop-blur-md px-5 py-4 rounded-3xl rounded-bl-md shadow-xl border border-white/10">
+                      <div className="flex items-center gap-2 mb-3 pb-3 border-b border-white/10">
+                        <div className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
+                        <span className="text-xs font-semibold text-sky-400 uppercase tracking-wider">Generating ANCL Blueprint</span>
+                      </div>
+                      <pre className="font-mono text-[11px] text-slate-300 leading-relaxed whitespace-pre-wrap scrollbar-hide">
+                        {codeLines.map((line, i) => (
+                          <div key={i} className={cn(
+                            line.startsWith("M:") ? "text-sky-300 font-bold" :
+                            line.startsWith("N:") ? "text-sky-300 font-bold" :
+                            line.startsWith("S(") ? "text-sky-300 font-bold" : ""
+                          )}>{line || " "}</div>
+                        ))}
+                        {!codeComplete && <span className="animate-pulse text-sky-400">▋</span>}
+                      </pre>
+                    </motion.div>
+                  </>
+                </AnimatePresence>
               </div>
-            </motion.div>
+
+              <footer className="p-6 border-t border-white/10">
+                {stage === "ancl" && codeComplete ? (
+                  <button onClick={() => setStage("building")} className="w-full py-4 bg-sky-500 text-white rounded-full font-semibold shadow-xl hover:bg-sky-600 transition-all flex items-center justify-center gap-2">
+                    Compile Project <ChevronRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <div className="w-full py-4 bg-white/15 border border-white/20 rounded-full text-white/70 text-sm text-center font-medium flex items-center justify-center gap-3">
+                    {stage === "building" ? <><Loader2 className="w-4 h-4 animate-spin" /> Compiling Assets</> : "Ready to Build"}
+                  </div>
+                )}
+              </footer>
+            </motion.aside>
           )}
         </AnimatePresence>
+
+        {(stage === "ancl" || stage === "building") && (
+          <div
+            className={cn("w-1.5 bg-white/20 hover:bg-sky-400/50 cursor-col-resize flex items-center justify-center transition-colors flex-shrink-0 z-20", isDragging && "bg-sky-400/50")}
+            onMouseDown={handleMouseDown}
+          >
+            <GripVertical className="w-4 h-4 text-white/50" />
+          </div>
+        )}
+
+        <main className="flex-1 relative flex flex-col min-w-0">
+          <AnimatePresence mode="wait">
+
+            {stage === "intro" && (
+              <motion.div key="intro" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.1 }} className="h-full flex flex-col items-center justify-center text-center max-w-2xl mx-auto px-6">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full mb-8 border border-white/30 backdrop-blur-md">
+                  <Sparkles className="w-4 h-4 text-white" />
+                  <span className="text-xs font-semibold text-white uppercase tracking-widest">AI Engine v2.4</span>
+                </div>
+                <h1 className="text-5xl font-bold text-white leading-[1.1] tracking-tight mb-6 drop-shadow-2xl">Prompt to App.<br />In Seconds.</h1>
+                <p className="text-lg text-white/90 font-normal leading-relaxed mb-10">Watch ANCL transform human intent into 2,000+ lines of production Dart code instantly.</p>
+                <button onClick={() => setStage("ancl")} className="px-12 py-5 bg-white text-sky-600 rounded-full font-bold text-lg shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
+                  Launch Builder <Play className="w-5 h-5 fill-current" />
+                </button>
+              </motion.div>
+            )}
+
+            {stage === "building" && (
+              <motion.div key="building" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full flex flex-col items-center justify-center px-6">
+                <div className="relative w-[300px] h-[200px] flex items-center justify-center animate-[float-hero_6s_ease-in-out_infinite]">
+                  <div className="aura-ring aura-ring-1" />
+                  <div className="aura-ring aura-ring-2" />
+                  <div className="blob blob-1" />
+                  <div className="blob blob-2" />
+                  <div className="blob blob-3" />
+                  <div className="cloud-core animate-[core-shimmer_2s_ease-in-out_infinite alternate]" />
+                </div>
+                <div className="mt-16 text-center z-10">
+                  <h2 className="text-4xl font-bold text-white tracking-tight mb-3">Manifesting your vision</h2>
+                  <div className="flex items-center justify-center gap-2 text-white/90">
+                    <span>{BUILD_STEPS[currentBuildStep].label}</span>
+                    <div className="flex gap-1 ml-2">
+                      <div className="w-1.5 h-1.5 bg-white rounded-full animate-[typing_1.4s_infinite]" />
+                      <div className="w-1.5 h-1.5 bg-white rounded-full animate-[typing_1.4s_infinite_0.2s]" />
+                      <div className="w-1.5 h-1.5 bg-white rounded-full animate-[typing_1.4s_infinite_0.4s]" />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {stage === "editor" && (
+              <motion.div key="editor" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full flex flex-col">
+                {/* Right Panel Header - Toggle between Code Base and Preview */}
+                <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/5 backdrop-blur-md shrink-0">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-emerald-400 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.8)]" />
+                      <span className="text-sm font-semibold text-white/90">Flutter Builder</span>
+                    </div>
+                    <div className="h-4 w-px bg-white/20" />
+                    <span className="text-xs text-white/50">InstaLite • Instagram Clone</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="flex bg-white/10 p-1 rounded-full border border-white/20">
+                      <button onClick={() => setRightPanelView("code")} className={cn("px-5 py-2 rounded-full text-xs font-bold transition-all", rightPanelView === "code" ? "bg-white text-slate-800 shadow-md" : "text-white/70 hover:text-white")}>
+                        Code Base
+                      </button>
+                      <button onClick={() => setRightPanelView("preview")} className={cn("px-5 py-2 rounded-full text-xs font-bold transition-all", rightPanelView === "preview" ? "bg-white text-slate-800 shadow-md" : "text-white/70 hover:text-white")}>
+                        Preview
+                      </button>
+                    </div>
+                    
+                    {rightPanelView === "preview" && (
+                      <div className="flex bg-white/10 p-1 rounded-full border border-white/20">
+                        <button onClick={() => setIsMobile(false)} className={cn("px-4 py-2 rounded-full text-xs font-bold transition-all", !isMobile ? "bg-white text-slate-800 shadow-md" : "text-white/70 hover:text-white")}>
+                          Desktop
+                        </button>
+                        <button onClick={() => setIsMobile(true)} className={cn("px-4 py-2 rounded-full text-xs font-bold transition-all", isMobile ? "bg-white text-slate-800 shadow-md" : "text-white/70 hover:text-white")}>
+                          Mobile
+                        </button>
+                      </div>
+                    )}
+                    
+                    <button className="px-5 py-2.5 bg-white text-sky-600 rounded-full font-bold text-xs shadow-xl hover:scale-105 active:scale-95 transition-all">
+                      Export
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Right Panel Content */}
+                <div className="flex-1 flex min-h-0">
+                  {rightPanelView === "code" ? (
+                    /* Code Base View - Same as Code Analysis */
+                    <div className="flex-1 grid grid-cols-[280px_1fr] gap-4 p-4 min-h-0">
+                      <aside className="glass-editorial rounded-[20px] p-5 flex flex-col text-[#374151] overflow-hidden">
+                        <div className="flex justify-between items-center mb-4">
+                          <span className="text-[10px] font-extrabold tracking-[1.5px] uppercase" style={{ color: 'rgba(15, 23, 42, 0.6)' }}>Project Files</span>
+                          <span className="text-[10px] font-extrabold tracking-[1.5px] uppercase" style={{ color: 'rgba(15, 23, 42, 0.6)' }}>{TOTAL_GENERATED_LINES.toLocaleString()} Lines</span>
+                        </div>
+                        <div className="flex-1 overflow-y-auto scrollbar-hide">
+                          <FileTree
+                            files={FILE_STRUCTURE}
+                            selectedFile={selectedFile?.path || null}
+                            onFileSelect={handleFileSelect}
+                            expandedFolders={expandedFolders}
+                            toggleFolder={toggleFolder}
+                          />
+                        </div>
+                      </aside>
+                      
+                      <div className="flex flex-col gap-4 min-h-0">
+                        <div className="flex-1 flex flex-col rounded-[16px] overflow-hidden" style={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+                          <div className="px-4 py-3 flex justify-between items-center shrink-0" style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                            <div className="flex gap-3 items-center">
+                              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                              <span className="text-sm font-semibold text-white truncate max-w-[200px]">{selectedFile?.path || 'lib/main.dart'}</span>
+                              <span className="text-xs text-white/50">{selectedFile?.lines || 34} lines</span>
+                            </div>
+                            <div className="flex gap-2 items-center">
+                              <div className="w-3 h-3 rounded-full" style={{ background: '#ef4444' }} />
+                              <div className="w-3 h-3 rounded-full" style={{ background: '#eab308' }} />
+                              <div className="w-3 h-3 rounded-full" style={{ background: '#22c55e' }} />
+                            </div>
+                          </div>
+                          <div className="flex-1 overflow-auto p-4 scrollbar-hide" style={{ fontFamily: "'Fira Code', monospace", fontSize: '13px', lineHeight: '1.7', color: '#e2e8f0' }}>
+                            {selectedFile && fileContent ? (
+                              highlightDartCode(fileContent)
+                            ) : (
+                              <div className="flex flex-col items-center justify-center h-full" style={{ color: '#64748b' }}>
+                                <FolderOpen className="w-10 h-10 mb-3 opacity-40" />
+                                <p className="text-sm font-medium">Select a file to view its contents</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* Stats Cards */}
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="glass-editorial rounded-[20px] p-5 text-[#374151]">
+                            <span className="text-[10px] font-extrabold tracking-[1.5px] uppercase block mb-3" style={{ color: 'rgba(15, 23, 42, 0.6)' }}>Compression</span>
+                            <div className="flex items-baseline gap-2 mb-3">
+                              <span className="text-[42px] font-black tracking-[-2px] leading-[0.9]" style={{ color: '#374151' }}>{COMPRESSION_RATIO}%</span>
+                              <span className="text-sm font-bold" style={{ color: '#374151' }}>Token<br />Reduction</span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3 pt-3" style={{ borderTop: '2px solid rgba(0,0,0,0.08)' }}>
+                              <div>
+                                <span className="text-[9px] font-extrabold uppercase tracking-[1px] block mb-1" style={{ color: 'rgba(15, 23, 42, 0.6)' }}>ANCL</span>
+                                <span className="text-sm font-extrabold" style={{ color: '#374151' }}>{ANCL_TOKENS}</span>
+                              </div>
+                              <div>
+                                <span className="text-[9px] font-extrabold uppercase tracking-[1px] block mb-1" style={{ color: 'rgba(15, 23, 42, 0.6)' }}>Flutter</span>
+                                <span className="text-sm font-extrabold" style={{ color: '#374151' }}>{REAL_FLUTTER_TOKENS.toLocaleString()}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="glass-editorial rounded-[20px] p-5 text-[#374151]">
+                            <span className="text-[10px] font-extrabold tracking-[1.5px] uppercase block mb-3" style={{ color: 'rgba(15, 23, 42, 0.6)' }}>Engine Benefits</span>
+                            <div className="space-y-3">
+                              {["Production-ready BloC", "~8 second build", "Live preview"].map((text, i) => (
+                                <div key={i} className="flex items-center gap-3 text-[13px] font-bold" style={{ color: '#374151' }}>
+                                  <div className="w-5 h-5 rounded-full bg-[#374151] flex items-center justify-center shrink-0">
+                                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                  </div>
+                                  {text}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Preview View */
+                    <div ref={previewAreaRef} className="flex-1 flex items-center justify-center p-4 md:p-6">
+                      <div 
+                        className={cn(
+                          "relative bg-white shadow-[0_40px_80px_-20px_rgba(0,0,0,0.25)] transition-all duration-500 overflow-hidden flex items-center justify-center",
+                          !isMobile && "w-full h-full max-w-[1200px] rounded-[24px] border-[6px] border-white/30 shadow-2xl"
+                        )}
+                        style={isMobile ? {
+                          height: '896px',
+                          transform: `scale(${mobileScale})`,
+                          transformOrigin: 'center center',
+                          borderWidth: '12px',
+                          borderColor: '#0f172a',
+                          borderRadius: '50px',
+                          borderStyle: 'solid'
+                        } : {}}
+                      >
+                        {/* Notch for Mobile */}
+                        {isMobile && (
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[140px] h-[32px] bg-[#0f172a] rounded-b-[20px] z-50 flex items-center justify-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-[#1e293b]" />
+                            <div className="w-10 h-1 rounded-full bg-[#1e293b]" />
+                          </div>
+                        )}
+
+                        <iframe src="/flutter-demo/web/index.html" className="border-0" style={isMobile ? { width: '414px', height: '896px' } : { width: '100%', height: '100%' }} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </main>
       </div>
     </div>
   );

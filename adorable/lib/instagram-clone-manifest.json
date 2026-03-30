@@ -1,0 +1,455 @@
+{
+  "metadata": {
+    "totalFiles": 69,
+    "totalLines": 5779,
+    "totalTokens": 43474,
+    "totalSize": 209562,
+    "estimatedFlutterTokens": 52169,
+    "compressionRatio": 95,
+    "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated",
+    "generatedAt": "2026-03-30T10:10:15.203Z"
+  },
+  "layers": {
+    "bloc": {
+      "files": 0,
+      "lines": 0,
+      "tokens": 0
+    },
+    "data": {
+      "files": 0,
+      "lines": 0,
+      "tokens": 0
+    },
+    "presentation": {
+      "files": 0,
+      "lines": 0,
+      "tokens": 0
+    },
+    "main": {
+      "files": 0,
+      "lines": 0,
+      "tokens": 0
+    },
+    "other": {
+      "files": 69,
+      "lines": 5779,
+      "tokens": 43474
+    }
+  },
+  "files": [
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/.dart_tool/dartpad/web_plugin_registrant.dart",
+      "name": "web_plugin_registrant.dart",
+      "lines": 19,
+      "tokens": 116
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/bloc/insta_bloc_bloc.dart",
+      "name": "insta_bloc_bloc.dart",
+      "lines": 612,
+      "tokens": 5703
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/bloc/insta_bloc_event.dart",
+      "name": "insta_bloc_event.dart",
+      "lines": 167,
+      "tokens": 920
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/bloc/insta_bloc_state.dart",
+      "name": "insta_bloc_state.dart",
+      "lines": 267,
+      "tokens": 3755
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/data/models/comment.dart",
+      "name": "comment.dart",
+      "lines": 59,
+      "tokens": 478
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/data/models/conversation_message.dart",
+      "name": "conversation_message.dart",
+      "lines": 51,
+      "tokens": 378
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/data/models/explore_item.dart",
+      "name": "explore_item.dart",
+      "lines": 27,
+      "tokens": 180
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/data/models/highlight_item.dart",
+      "name": "highlight_item.dart",
+      "lines": 27,
+      "tokens": 190
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/data/models/post.dart",
+      "name": "post.dart",
+      "lines": 55,
+      "tokens": 395
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/data/models/relationship_user.dart",
+      "name": "relationship_user.dart",
+      "lines": 47,
+      "tokens": 349
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/data/models/story.dart",
+      "name": "story.dart",
+      "lines": 27,
+      "tokens": 179
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/data/repositories/insta_bloc_local_repository.dart",
+      "name": "insta_bloc_local_repository.dart",
+      "lines": 28,
+      "tokens": 186
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/main.dart",
+      "name": "main.dart",
+      "lines": 35,
+      "tokens": 174
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/action_pill.dart",
+      "name": "action_pill.dart",
+      "lines": 40,
+      "tokens": 278
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/bottom_tab_shell.dart",
+      "name": "bottom_tab_shell.dart",
+      "lines": 45,
+      "tokens": 360
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/comment_composer.dart",
+      "name": "comment_composer.dart",
+      "lines": 111,
+      "tokens": 830
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/comment_row.dart",
+      "name": "comment_row.dart",
+      "lines": 121,
+      "tokens": 840
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/comment_sheet_header.dart",
+      "name": "comment_sheet_header.dart",
+      "lines": 55,
+      "tokens": 316
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/conversation_composer.dart",
+      "name": "conversation_composer.dart",
+      "lines": 118,
+      "tokens": 778
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/conversation_header.dart",
+      "name": "conversation_header.dart",
+      "lines": 99,
+      "tokens": 624
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/conversation_hint.dart",
+      "name": "conversation_hint.dart",
+      "lines": 18,
+      "tokens": 92
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/explore_grid.dart",
+      "name": "explore_grid.dart",
+      "lines": 37,
+      "tokens": 198
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/explore_tile.dart",
+      "name": "explore_tile.dart",
+      "lines": 60,
+      "tokens": 413
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/media_composer.dart",
+      "name": "media_composer.dart",
+      "lines": 64,
+      "tokens": 472
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/media_detail_viewer.dart",
+      "name": "media_detail_viewer.dart",
+      "lines": 144,
+      "tokens": 1143
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/media_grid.dart",
+      "name": "media_grid.dart",
+      "lines": 83,
+      "tokens": 558
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/message_bubble.dart",
+      "name": "message_bubble.dart",
+      "lines": 123,
+      "tokens": 922
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/message_notice_banner.dart",
+      "name": "message_notice_banner.dart",
+      "lines": 41,
+      "tokens": 259
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/post_actions.dart",
+      "name": "post_actions.dart",
+      "lines": 130,
+      "tokens": 786
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/post_card.dart",
+      "name": "post_card.dart",
+      "lines": 58,
+      "tokens": 393
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/post_draft_preview.dart",
+      "name": "post_draft_preview.dart",
+      "lines": 50,
+      "tokens": 319
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/post_header.dart",
+      "name": "post_header.dart",
+      "lines": 55,
+      "tokens": 354
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/post_media.dart",
+      "name": "post_media.dart",
+      "lines": 76,
+      "tokens": 556
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/post_meta.dart",
+      "name": "post_meta.dart",
+      "lines": 38,
+      "tokens": 224
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/privacy_state_badge.dart",
+      "name": "privacy_state_badge.dart",
+      "lines": 38,
+      "tokens": 269
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/profile_action_row.dart",
+      "name": "profile_action_row.dart",
+      "lines": 55,
+      "tokens": 479
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/profile_content_tabs.dart",
+      "name": "profile_content_tabs.dart",
+      "lines": 154,
+      "tokens": 1228
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/profile_highlights_row.dart",
+      "name": "profile_highlights_row.dart",
+      "lines": 67,
+      "tokens": 424
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/profile_identity_header.dart",
+      "name": "profile_identity_header.dart",
+      "lines": 110,
+      "tokens": 819
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/profile_metrics_bar.dart",
+      "name": "profile_metrics_bar.dart",
+      "lines": 51,
+      "tokens": 333
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/profile_stat.dart",
+      "name": "profile_stat.dart",
+      "lines": 29,
+      "tokens": 163
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/profile_top_bar.dart",
+      "name": "profile_top_bar.dart",
+      "lines": 65,
+      "tokens": 449
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/publish_action_bar.dart",
+      "name": "publish_action_bar.dart",
+      "lines": 150,
+      "tokens": 1221
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/quick_reaction_bar.dart",
+      "name": "quick_reaction_bar.dart",
+      "lines": 42,
+      "tokens": 282
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/reel_actions.dart",
+      "name": "reel_actions.dart",
+      "lines": 28,
+      "tokens": 182
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/reel_card.dart",
+      "name": "reel_card.dart",
+      "lines": 73,
+      "tokens": 499
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/reel_pager.dart",
+      "name": "reel_pager.dart",
+      "lines": 50,
+      "tokens": 321
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/relationship_action_chip.dart",
+      "name": "relationship_action_chip.dart",
+      "lines": 34,
+      "tokens": 241
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/search_surface.dart",
+      "name": "search_surface.dart",
+      "lines": 103,
+      "tokens": 814
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/section_header.dart",
+      "name": "section_header.dart",
+      "lines": 29,
+      "tokens": 169
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/social_list_sheet.dart",
+      "name": "social_list_sheet.dart",
+      "lines": 103,
+      "tokens": 721
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/social_tab_bar.dart",
+      "name": "social_tab_bar.dart",
+      "lines": 270,
+      "tokens": 1859
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/story_bubble.dart",
+      "name": "story_bubble.dart",
+      "lines": 62,
+      "tokens": 498
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/story_tray.dart",
+      "name": "story_tray.dart",
+      "lines": 55,
+      "tokens": 311
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/story_viewer.dart",
+      "name": "story_viewer.dart",
+      "lines": 189,
+      "tokens": 1375
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/components/surface_header.dart",
+      "name": "surface_header.dart",
+      "lines": 29,
+      "tokens": 170
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/screens/comments_view_screen.dart",
+      "name": "comments_view_screen.dart",
+      "lines": 120,
+      "tokens": 850
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/screens/create_view_screen.dart",
+      "name": "create_view_screen.dart",
+      "lines": 55,
+      "tokens": 356
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/screens/followers_view_screen.dart",
+      "name": "followers_view_screen.dart",
+      "lines": 59,
+      "tokens": 393
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/screens/following_view_screen.dart",
+      "name": "following_view_screen.dart",
+      "lines": 59,
+      "tokens": 392
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/screens/home_view_screen.dart",
+      "name": "home_view_screen.dart",
+      "lines": 107,
+      "tokens": 720
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/screens/main_route_screen.dart",
+      "name": "main_route_screen.dart",
+      "lines": 28,
+      "tokens": 241
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/screens/media_viewer_view_screen.dart",
+      "name": "media_viewer_view_screen.dart",
+      "lines": 56,
+      "tokens": 373
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/screens/messages_view_screen.dart",
+      "name": "messages_view_screen.dart",
+      "lines": 136,
+      "tokens": 975
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/screens/profile_view_screen.dart",
+      "name": "profile_view_screen.dart",
+      "lines": 173,
+      "tokens": 1336
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/screens/reels_view_screen.dart",
+      "name": "reels_view_screen.dart",
+      "lines": 39,
+      "tokens": 198
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/screens/search_view_screen.dart",
+      "name": "search_view_screen.dart",
+      "lines": 63,
+      "tokens": 405
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/screens/shell_view_screen.dart",
+      "name": "shell_view_screen.dart",
+      "lines": 63,
+      "tokens": 412
+    },
+    {
+      "path": "C:/Users/affan/Affan Projects/samaa/connectit/quickapp/examples/instagram_clone_generated/lib/presentation/screens/story_view_screen.dart",
+      "name": "story_view_screen.dart",
+      "lines": 48,
+      "tokens": 278
+    }
+  ]
+}
