@@ -779,15 +779,6 @@ export default function InvestorDemoPage() {
                 
                 {/* Mobile UI - Completely Redesigned from First Principles */}
                 <div className="flex-1 md:hidden flex flex-col bg-[#f8fafc]">
-                  {/* Mobile Top Bar */}
-                  <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between shrink-0">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-emerald-400 rounded-full" />
-                      <span className="text-sm font-semibold text-slate-900">Flutter Builder</span>
-                    </div>
-                    <span className="text-xs text-slate-500">InstaLite</span>
-                  </div>
-                  
                   {/* Mobile Content Area */}
                   <div className="flex-1 relative overflow-hidden">
                     {/* Mobile Code View */}
@@ -865,21 +856,6 @@ export default function InvestorDemoPage() {
                     {/* Mobile Preview View */}
                     <div className={cn("absolute inset-0 transition-all duration-300", mobileViewTab === "preview" ? "translate-x-0" : "translate-x-full")}>
                       <div className="h-full flex flex-col bg-gradient-to-b from-sky-100 to-sky-200">
-                        {/* Preview Controls */}
-                        <div className="bg-white/80 backdrop-blur-lg px-4 py-3 flex items-center justify-between shrink-0 border-b border-white/50">
-                          <span className="text-sm font-semibold text-slate-900">Preview</span>
-                          <div className="flex items-center gap-2">
-                            <div className="flex bg-slate-100 p-1 rounded-lg">
-                              <button onClick={() => setIsMobile(false)} className={cn("px-3 py-1.5 rounded-md text-xs font-medium transition-all", !isMobile ? "bg-white text-slate-900 shadow-sm" : "text-slate-500")}>
-                                Desktop
-                              </button>
-                              <button onClick={() => setIsMobile(true)} className={cn("px-3 py-1.5 rounded-md text-xs font-medium transition-all", isMobile ? "bg-white text-slate-900 shadow-sm" : "text-slate-500")}>
-                                Mobile
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        
                         {/* Device Frame */}
                         <div className="flex-1 flex items-center justify-center p-4">
                           <div 
@@ -894,17 +870,9 @@ export default function InvestorDemoPage() {
                                 <div className="w-2 h-2 rounded-full bg-slate-700" />
                               </div>
                             )}
-                            
+
                             <iframe src="/flutter-demo/web/index.html" className="w-full h-full border-0" />
                           </div>
-                        </div>
-                        
-                        {/* Bottom Action Bar */}
-                        <div className="bg-white/90 backdrop-blur-lg px-4 py-4 shrink-0 border-t border-white/50">
-                          <button className="w-full py-3 bg-slate-900 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                            Export App
-                          </button>
                         </div>
                       </div>
                     </div>
