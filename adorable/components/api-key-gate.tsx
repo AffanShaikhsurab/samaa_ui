@@ -292,8 +292,8 @@ function ApiKeySetupScreen({ onSaved }: { onSaved: () => void }) {
 /*  Settings dialog – for changing/deleting key from within the app    */
 /* ------------------------------------------------------------------ */
 
-export function ApiKeySettingsDialog() {
-  const [open, setOpen] = React.useState(false);
+export function ApiKeySettingsDialog({ open, onOpenChange }: { open?: boolean; onOpenChange?: (open: boolean) => void }) {
+  const [openState, setOpenState] = React.useState(false);
   const [status, setStatus] = React.useState<ApiKeyStatus | null>(null);
   const [provider, setProvider] = React.useState<Provider>("openai");
   const [apiKey, setApiKey] = React.useState("");
@@ -301,8 +301,12 @@ export function ApiKeySettingsDialog() {
   const [saving, setSaving] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
 
+  const isControlled = open !== undefined && onOpenChange !== undefined;
+  const isOpen = isControlled ? open : openState;
+  const setIsOpen = isControlled ? onOpenChange! : setOpenState;
+
   React.useEffect(() => {
-    if (!open) return;
+    if (!isOpen) return;
     setApiKey("");
     setError(null);
     void (async () => {
@@ -313,7 +317,7 @@ export function ApiKeySettingsDialog() {
         setProvider(data.provider);
       }
     })();
-  }, [open]);
+  }, [isOpen]);
 
   const handleSave = async () => {
     const key = apiKey.trim();
@@ -334,7 +338,7 @@ export function ApiKeySettingsDialog() {
         setError(data.error ?? "Failed to save");
         return;
       }
-      setOpen(false);
+      setIsOpen(false);
     } catch {
       setError("Failed to save API key");
     } finally {
@@ -350,7 +354,7 @@ export function ApiKeySettingsDialog() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "delete" }),
       });
-      setOpen(false);
+      setIsOpen(false);
       // Reload to trigger the gate check
       window.location.reload();
     } catch {
@@ -361,7 +365,7 @@ export function ApiKeySettingsDialog() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <button
           type="button"

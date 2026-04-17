@@ -14,6 +14,7 @@ export async function OPTIONS(req: NextRequest) {
     headers: {
       "Allow": "POST, OPTIONS",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "X-Samaa-Legacy-Route": "Use /api/builder/sessions",
     },
   });
 }
@@ -151,6 +152,7 @@ export async function POST(req: NextRequest) {
       originalMessages: messages,
       generateMessageId: () => crypto.randomUUID(),
     });
+    response.headers.set("X-Samaa-Legacy-Route", "Use /api/builder/sessions");
 
     if (isNewSession) {
       response.headers.set(

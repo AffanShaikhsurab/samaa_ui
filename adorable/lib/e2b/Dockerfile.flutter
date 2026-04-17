@@ -9,5 +9,28 @@ RUN apt-get update -y && \
 
 ENV FLUTTER_ROOT=/home/user/flutter
 ENV PUB_CACHE=/home/user/.pub-cache
-ENV PATH=/home/user/flutter/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV PATH=/home/user/flutter/bin:/home/user/.pub-cache/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ENV CI=true
+
+COPY --chown=user:user quickapp-vendor /home/user/quickapp-src
+
+RUN chown -R user:user /home/user/quickapp-src && chmod -R u+rwX /home/user/quickapp-src
+
+USER user
+
+RUN git clone https://github.com/flutter/flutter.git -b stable --depth 1 /home/user/flutter
+
+RUN export PATH=/home/user/flutter/bin:/home/user/.pub-cache/bin:$PATH && \
+    flutter --version && \
+    dart --version && \
+    cd /home/user/quickapp-src && \
+    flutter pub get
+
+RUN mkdir -p /home/user/.pub-cache/bin && \
+    echo '#!/usr/bin/env bash' > /home/user/.pub-cache/bin/quickapp && \
+    echo 'set -euo pipefail' >> /home/user/.pub-cache/bin/quickapp && \
+    echo 'export PATH=/home/user/flutter/bin:/home/user/.pub-cache/bin:$PATH' >> /home/user/.pub-cache/bin/quickapp && \
+    echo 'cd /home/user/quickapp-src' >> /home/user/.pub-cache/bin/quickapp && \
+    echo 'flutter pub run quickapp:quickapp "$@"' >> /home/user/.pub-cache/bin/quickapp && \
+    chmod +x /home/user/.pub-cache/bin/quickapp && \
+    timeout 60s /home/user/.pub-cache/bin/quickapp --version

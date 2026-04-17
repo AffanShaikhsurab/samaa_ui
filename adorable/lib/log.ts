@@ -40,7 +40,11 @@ type Tag =
   | "Error"
   | "Middleware"
   | "Cookie"
-  | "Header";
+  | "Header"
+  | "Auth"
+  | "ANCL"
+  | "GitHub"
+  | "Store";
 
 const TAG_COLORS: Record<Tag, string> = {
   Sandbox: COLORS.cyan,
@@ -58,6 +62,10 @@ const TAG_COLORS: Record<Tag, string> = {
   Middleware: COLORS.magenta,
   Cookie: COLORS.cyan,
   Header: COLORS.yellow,
+  Auth: COLORS.green,
+  ANCL: COLORS.yellow,
+  GitHub: COLORS.blue,
+  Store: COLORS.gray,
 };
 
 function ts(): string {
@@ -164,4 +172,24 @@ export const log = {
   header: (msg: string, data?: unknown) => emit("Header", msg, data),
   headerWarn: (msg: string, data?: unknown) => warn("Header", msg, data),
   headerError: (msg: string, data?: unknown) => error("Header", msg, data),
+
+  // ── Authentication ─────────────────────────────────────────────
+  auth: (msg: string, data?: unknown) => emit("Auth", msg, data),
+  authWarn: (msg: string, data?: unknown) => warn("Auth", msg, data),
+  authError: (msg: string, data?: unknown) => error("Auth", msg, data),
+
+  // ── ANCL pipeline ──────────────────────────────────────────────
+  ancl: (msg: string, data?: unknown) => emit("ANCL", msg, data),
+  anclWarn: (msg: string, data?: unknown) => warn("ANCL", msg, data),
+  anclError: (msg: string, data?: unknown) => error("ANCL", msg, data),
+
+  // ── GitHub integration ─────────────────────────────────────────
+  github: (msg: string, data?: unknown) => emit("GitHub", msg, data),
+  githubWarn: (msg: string, data?: unknown) => warn("GitHub", msg, data),
+  githubError: (msg: string, data?: unknown) => error("GitHub", msg, data),
+
+  // ── Project store ──────────────────────────────────────────────
+  store: (msg: string, data?: unknown) => emit("Store", msg, data),
+  storeWarn: (msg: string, data?: unknown) => warn("Store", msg, data),
+  storeError: (msg: string, data?: unknown) => error("Store", msg, data),
 };

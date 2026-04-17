@@ -18,6 +18,28 @@ OPENAI_API_KEY=your-openai-api-key
 
 > **Note**: You can copy `.env.example` to `.env.local` and fill in your values.
 
+### 1.1 Clerk + Convex Auth (required)
+
+To enable Clerk-based authentication with Convex:
+
+1. Create a Clerk app and enable the Convex integration in Clerk.
+2. Set these environment variables in `.env.local`:
+
+```
+NEXT_PUBLIC_CONVEX_URL=your_convex_deployment_url
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+CLERK_JWT_ISSUER_DOMAIN=https://your-clerk-domain.clerk.accounts.dev
+```
+
+3. Sync Convex auth config:
+
+```bash
+npx convex dev
+```
+
+The app fails to start when `NEXT_PUBLIC_CONVEX_URL` or `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` is missing. This ensures Clerk + Convex auth is always wired correctly.
+
 ### 2. Install Dependencies
 
 ```bash

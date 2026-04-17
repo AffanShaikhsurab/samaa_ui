@@ -12,7 +12,7 @@ import {
 } from "ai";
 import { log } from "./log";
 
-type LlmProviderName = "openai" | "anthropic" | "groq" | "nvidia";
+export type LlmProviderName = "openai" | "anthropic" | "groq" | "nvidia";
 
 export interface LlmCallSettings {
   maxRetries?: number;
@@ -41,7 +41,7 @@ const DEFAULT_MAX_RETRIES = 3;
 const GROQ_BASE_URL = "https://api.groq.com/openai/v1";
 const NVIDIA_BASE_URL = "https://integrate.api.nvidia.com/v1";
 
-const getProviderName = (override?: string): LlmProviderName => {
+export const resolveProviderName = (override?: string): LlmProviderName => {
   const value = (override ?? process.env["LLM_PROVIDER"])?.toLowerCase().trim();
   if (value === "anthropic" || value === "claude") return "anthropic";
   if (value === "groq") return "groq";
@@ -57,7 +57,7 @@ export const streamLlmResponse = async ({
   providerOverride,
   callSettings,
 }: StreamLlmResponseParams): Promise<StreamLlmResponseResult> => {
-  const provider = getProviderName(providerOverride);
+  const provider = resolveProviderName(providerOverride);
   const maxRetries = callSettings?.maxRetries ?? DEFAULT_MAX_RETRIES;
   const temperature = callSettings?.temperature ?? DEFAULT_TEMPERATURE;
   const maxTokens = callSettings?.maxTokens;
@@ -119,37 +119,22 @@ export const streamLlmResponse = async ({
   if (provider === "nvidia") {
     log.llm("using NVIDIA provider, checking for API key…");
     const nvidiaApiKey = apiKey ?? process.env["NVIDIA_API_KEY"];
-    const groqApiKey = apiKey ?? process.env["GROQ_API_KEY"];
 
     if (nvidiaApiKey) {
-      log.llm("using NVIDIA: meta/llama-3.3-70b-instruct");
+      log.llm("using NVIDIA: qwen/qwen3-coder-480b-a35b-instruct");
       const nvidiaProvider = createOpenAI({
         apiKey: nvidiaApiKey,
         baseURL: NVIDIA_BASE_URL,
       });
       const result = streamText({
         ...baseStreamConfig,
-        model: nvidiaProvider.chat("meta/llama-3.3-70b-instruct"),
+        model: nvidiaProvider.chat("qwen/qwen3-coder-480b-a35b-instruct"),
       });
       log.llm("streamText() called — streaming will begin");
       return { result, provider: "nvidia" as LlmProviderName };
     }
 
-    if (groqApiKey) {
-      log.llm("NVIDIA key not found, falling back to Groq: llama-3.3-70b-versatile");
-      const groqProvider = createOpenAI({
-        apiKey: groqApiKey,
-        baseURL: GROQ_BASE_URL,
-      });
-      const result = streamText({
-        ...baseStreamConfig,
-        model: groqProvider.chat("llama-3.3-70b-versatile"),
-      });
-      log.llm("streamText() called — streaming will begin");
-      return { result, provider: "groq" as LlmProviderName };
-    }
-
-    log.llmWarn("no NVIDIA or Groq API key found, falling back to Anthropic");
+    log.llmWarn("NVIDIA was selected but no NVIDIA_API_KEY was found; refusing Groq fallback and using Anthropic instead");
     const anthropicProvider = createAnthropic({});
     const result = streamText({
       ...baseStreamConfig,

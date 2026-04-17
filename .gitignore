@@ -1,5 +1,17 @@
+/node_modules
+./node_modules
+
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
 # dependencies
 /node_modules
+/adorable/node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -49,3 +61,14 @@ plans/
 reference.jpeg
 refernce-2.jpeg
 workspace_verify*.png
+
+# local history artifacts
+**/.history/
+**/.history/**
+adorable/.e2b-build/
+adorable/e2b-build/
+adorable/.samaa/
+adorable/.samaa-sdk-workspaces/
+adorable/.tmp-start*.log
+adorable/.e2b-build/quickapp/.history/
+adorable/e2b-build/quickapp/.history/
